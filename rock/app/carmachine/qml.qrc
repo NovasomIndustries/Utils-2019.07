@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>video.qml</file>
+        <file>video3399.qml</file>
+        <file>camera.qml</file>
+        <file>camera_px3se.qml</file>
+    </qresource>
+</RCC>

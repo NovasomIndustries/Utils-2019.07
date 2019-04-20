@@ -1,0 +1,18 @@
+#!/bin/sh
+# $1 = kernel
+# $2 = source me file
+. ../version
+KERNEL=$1
+SOURCEMEFILE=$2
+echo "Working on ${KERNEL} with ${SOURCEMEFILE}"
+echo "1" > /tmp/result
+. ../${SOURCEMEFILE}
+cd ../../Kernel/${KERNEL}
+make -j32 Image
+[ ! "$?" = "0" ] && exit
+make -j32 modules
+[ ! "$?" = "0" ] && exit
+make qcom/apq8016-sbc.dtb
+cp arch/arm64/boot/Image /Devel/NOVAsdk${VERSION}/Blobs/linux-qualcomm-4.11.0_Image
+cp arch/arm64/boot/Image /Devel/NOVAsdk${VERSION}/Deploy/.
+echo "0" > /tmp/result

@@ -1,0 +1,4 @@
+*.user
+*.user.*
+Makefile
+pkg-config_wrapper.sh

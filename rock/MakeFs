@@ -1,0 +1,55 @@
+#!/bin/sh
+# ${1} is file system name
+# ${2} is the REFERENCE_SERVER IP
+# ${3} is the KERNEL
+
+echo "1" > /tmp/result
+HERE="/Devel/NOVAsdk/Utils/rock"
+PREPEND_PATH="/Devel/NOVAsdk/FileSystem"
+DEPLOY_PATH="/Devel/NOVAsdk/Deploy"
+FSNAME=$1
+IP=$2
+KERNEL=$3
+KERNEL_PATH="/Devel/NOVAsdk/Kernel/${KERNEL}"
+FILESYSTEM_PATH="/Devel/NOVAsdk/FileSystem/${FSNAME}"
+echo ""
+echo "*******************************"
+echo "**** File system Name : $1 ****"
+echo "**** Assigned IP      : $2 ****"
+echo "**** Kernel           : $3 ****"
+echo "*******************************"
+cd ${PREPEND_PATH}/${FSNAME}
+cp -r /Devel/NOVAsdk/Utils/FsBsp/novasis/NOVAsomM7/Init/* board/novasis/NOVAsomM7/Init/.
+echo "REFERENCE_SERVER=${2}" > board/novasis/NOVAsomM7/Init/etc/sysconfig/system_vars
+echo "1" > /tmp/result
+
+FS_COMPILED="0"
+[ -d output/target/lib ] && FS_COMPILED="1"
+
+# install module before make if file system is present AND kernel is present
+if [ "${FS_COMPILED}" = "1" ]; then
+	if [ -f ${KERNEL_PATH}/arch/arm64/boot/Image ]; then
+		cd ${HERE}
+		./modules_install ${KERNEL_PATH}  ${FILESYSTEM_PATH} SourceMe64
+		[ "$?" != "0" ] && exit
+		cd ${PREPEND_PATH}/${FSNAME}
+	fi
+	make
+	[ "$?" != "0" ] && exit
+else
+	# here a double make is needed, the first to create the directories and the second after the modules installation
+	make
+	[ "$?" != "0" ] && exit
+	if [ -f ${KERNEL_PATH}/arch/arm64/boot/Image ]; then
+		cd ${HERE}
+	       ./modules_install ${KERNEL_PATH}  ${FILESYSTEM_PATH} SourceMe64
+		[ "$?" != "0" ] && exit
+		cd ${PREPEND_PATH}/${FSNAME}
+		make
+		[ "$?" != "0" ] && exit
+	fi
+fi
+rm ${DEPLOY_PATH}/*.buildroot.config
+cp ${PREPEND_PATH}/${FSNAME}/.config ${DEPLOY_PATH}/${FSNAME}.buildroot.config
+
+echo "0" > /tmp/result

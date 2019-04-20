@@ -1,0 +1,129 @@
+#!/bin/bash
+# ${1} is number of user partition
+# ${2} is size of first user partition, if enabled
+# ${3} is size of second user partition, if enabled
+# ${4} is the device
+# ${5} is the dtb
+
+USERNUM=${1}
+SIZE1=${2}
+SIZE2=${3}
+DISK=${4}
+DTB=${5}
+# NOVASOM_PARAMS=${7}
+# RAMDISK_SIZE=${8}
+KERNEL="arch/arm64/boot/Image"
+BOOTDIR="../../Bootloader/u-boot-novasomM7-2017.09"
+KERNELDIR="../../Kernel/linux-4.4.167_M7"
+DEPLOYDIR="../../Deploy"
+FILES="${KERNELDIR}/${KERNEL} ${BOOTDIR}/idbloader.img ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+for i in ${FILES}; do
+	if ! [ -f ${i} ]; then
+		NOTFOUND=`basename ${i}`
+		NOTFOUND=${i}
+		echo "${NOTFOUND} not found. giving up"
+		echo "1" > /tmp/result
+		exit 1
+	fi
+done
+if ! [ -f ../../Deploy/uInitrd ]; then
+	echo "uInitrd not found. giving up"
+	echo "1" > /tmp/result
+	exit 1
+fi
+[ "${DISK}" = "" ] && DISK="/dev/sdb"
+echo -n "Zeroing ${DISK} ... "
+sudo dd if=/dev/zero of=${DISK} bs=32M count=1 > /dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating basic structure on ${DISK} ... "
+sudo sgdisk -Z ${DISK} > /dev/null 2>&1
+sudo partprobe ${DISK} > /dev/null 2>&1
+echo "Done"
+sync
+echo -n "Creating partitions ... "
+sudo sgdisk -n 1::+7M  -c 1:loader1 ${DISK}
+sudo sgdisk -n 2::+4M  -c 2:loader2 ${DISK}
+sudo sgdisk -n 3::+4M  -c 3:trust ${DISK}
+sudo sgdisk -n 8::+512M -c 8:M7Boot ${DISK}
+sudo sgdisk -n 4::+16M -c 4:config ${DISK}
+if [ "${USERNUM}" = "1" ]; then
+	if [ "${SIZE1}" = "0" ]; then
+		sudo sgdisk -n 5::      -c 5:user1 ${DISK}
+	else
+		sudo sgdisk -n 5::+${SIZE1}M     -c 5:user1 ${DISK}
+	fi
+
+fi
+P6DONE="0"
+if [ "${USERNUM}" = "2" ]; then
+	if [ "${SIZE1}" = "0" ]; then
+		if ! [ "${SIZE2}" = "0" ]; then
+			sudo sgdisk -n 6::+${SIZE2}M      -c 6:user2 ${DISK}
+			P6DONE="1"
+		fi
+		sudo sgdisk -n 5::      -c 5:user1 ${DISK}
+	else
+		sudo sgdisk -n 5::+${SIZE1}M      -c 5:user1 ${DISK}
+	fi
+	if [ "${P6DONE}" = "0" ]; then
+		if [ "${SIZE2}" = "0" ]; then
+			sudo sgdisk -n 6::      -c 6:user2 ${DISK}
+		else
+			sudo sgdisk -n 6::+${SIZE2}M      -c 6:user2 ${DISK}
+		fi
+	fi
+fi
+sudo sgdisk -A 8:set:2 -t 8:0700 ${DISK}
+sleep 1
+sync
+sleep 1
+sudo partprobe ${DISK} 
+sleep 1
+echo "Done"
+echo -n "Formatting and populating partition 4... "
+yes | sudo mkfs.ext4 ${DISK}4
+echo "Done"
+if [ "${USERNUM}" = "1" ]; then
+	echo -n "Formatting and populating partition 5... "
+	yes | sudo mkfs.ext4 ${DISK}5
+	echo "Done"
+fi
+if [ "${USERNUM}" = "2" ]; then
+	echo -n "Formatting and populating partition 5... "
+	yes | sudo mkfs.ext4 ${DISK}5
+	echo "Done"
+	echo -n "Formatting and populating partition 6... "
+	yes | sudo mkfs.ext4 ${DISK}6
+	echo "Done"
+fi
+echo -n "Formatting and populating partition 8... "
+#yes | sudo mkfs.vfat ${DISK}8
+yes | sudo mkfs.ext2 ${DISK}8
+echo "Done"
+sync
+echo -n "Storing "
+echo -n "idbloader.img "
+sudo dd if=${BOOTDIR}/idbloader.img of=/dev/sdb seek=64 conv=notrunc > /dev/null 2>&1
+echo -n "uboot.img "
+sudo dd if=${BOOTDIR}/uboot.img of=/dev/sdb seek=16384 conv=notrunc > /dev/null 2>&1
+echo -n "trust.img "
+sudo dd if=${BOOTDIR}/trust.img of=/dev/sdb seek=24576 conv=notrunc > /dev/null 2>&1
+sync
+echo "Done"
+rm -rf mdisk ; mkdir mdisk
+sudo mount ${DISK}8 mdisk
+sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
+sudo cp ${DEPLOYDIR}/m7_dtb.dtb mdisk/dtb.dtb
+sudo cp ${DEPLOYDIR}/uInitrd mdisk/.
+sudo cp ${DEPLOYDIR}/*.config mdisk/.
+cat NOVAsomParams_M7 > /tmp/NOVAsomParams_Local
+sudo cp /tmp/NOVAsomParams_Local mdisk/NOVAsomParams
+sudo cp /tmp/NOVAsomParams_Local ${DEPLOYDIR}/NOVAsomParams
+sudo umount mdisk
+sync
+echo "Done."
+echo -n "Finishing up ..."
+sync
+echo "Done."
+echo "0" > /tmp/result

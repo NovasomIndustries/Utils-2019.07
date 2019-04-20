@@ -1,0 +1,25 @@
+#!/bin/sh
+. ./version
+UPD_ELEMENTS="\
+Kernel/linux-imx_4.1.15_1.2.0_ga_${VERSION} \
+Kernel/linux-imx_4.1.43_${VERSION} \
+Kernel/linux-4.11.0-QualcommLinaro_${VERSION} \
+Kernel/linux-imx_4.1.15_1.2.0_debian_${VERSION} \
+Kernel/linux-4.4.167_M7_${VERSION}"
+
+cd /Devel/NOVAsdk${VERSION}
+for i in ${UPD_ELEMENTS}; do
+	HERE=`pwd`
+	if [ -d ${i} ]; then
+		cd ${i}
+		echo -n "Working on ${i} ... "
+		# Kernel was stopped during build, so .git has been shadowed from git. re push in place.
+		if [ -d gitb.git ]; then
+			mv gitb.git .git
+		fi
+		git pull
+		make distclean ; make mrproper
+	fi
+	cd ${HERE}
+done
+

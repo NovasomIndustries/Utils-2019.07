@@ -1,0 +1,10 @@
+Entries are sorted chronologically from oldest to youngest within each release,
+releases are sorted from youngest to oldest.
+
+version 2019.1.001 : 
+- Added new versioning system
+- Fixed scripts for M7 , P and U5
+- Fixed configuration files
+- Added patch for gst1-libav-rk
+version 2019.1.000 : 
+- Initial release

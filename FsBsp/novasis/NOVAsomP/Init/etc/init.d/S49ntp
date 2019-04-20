@@ -1,0 +1,6 @@
+#! /bin/sh
+#
+# Empty, used after network is up
+#
+
+exit 0

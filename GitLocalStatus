@@ -1,0 +1,30 @@
+#!/bin/bash
+. ./version
+KERNELS="Kernel/linux-4.11.0-QualcommLinaro_${VERSION} Kernel/linux-allw-4.14.0 Kernel/linux-imx_4.1.15_1.2.0_ga_${VERSION} Kernel/linux-imx_4.1.43_${VERSION}"
+DIRS="Utils-${VERSION} Xcompiler-${VERSION} Qt/NOVAembed-${VERSION} Bootloader/u-boot-novasomM8-2017.11_${VERSION} Bootloader/u-boot-novasomP-2015.04_${VERSION} Bootloader/u-boot-novasomU-2016.03_${VERSION} Bootloader/u-boot-NOVAsomH5-2017.11_${VERSION}"
+REPOCOUNT=`echo "$DIRS" | awk '{print NF}'`
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+HERE=`pwd`
+COUNTMODS=0
+COUNTSENT=0
+INCREMENT=1
+echo ""
+for i in ${KERNELS}; do
+	if [ -d ../${i} ]; then
+		DIRS="${DIRS} ${i}"
+	else
+		printf "${RED}Skipping ${i} as not present${NC}\n"
+	fi
+done
+echo ""
+
+for i in ${DIRS}; do
+        cd /Devel/${VERSION}/${i}
+        BASE=`basename ${i}`
+	printf "${GREEN}-----> On ${i} <-----${NC}\n"
+	git status -s
+done
+echo ""

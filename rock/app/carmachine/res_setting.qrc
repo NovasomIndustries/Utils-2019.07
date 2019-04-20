@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/setting/setting_icon.png</file>
+        <file>image/setting/setting_bg.jpg</file>
+        <file>image/setting/bt_normal.png</file>
+        <file>image/setting/bt_seleted.png</file>
+        <file>image/setting/common_normal.png</file>
+        <file>image/setting/system_normal.png</file>
+        <file>image/setting/system_seleted.png</file>
+        <file>image/setting/wifi_normal.png</file>
+        <file>image/setting/wifi_seleted.png</file>
+        <file>image/setting/common_seleted.png</file>
+        <file>image/setting/ic_wifi_locked.png</file>
+        <file>image/setting/ic_wifi_signal_1_dark.png</file>
+        <file>image/setting/ic_wifi_signal_2_dark.png</file>
+        <file>image/setting/ic_wifi_signal_3_dark.png</file>
+        <file>image/setting/ic_wifi_signal_4_dark.png</file>
+        <file>image/setting/ic_wifi_unlocked.png</file>
+    </qresource>
+</RCC>

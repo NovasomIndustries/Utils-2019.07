@@ -1,0 +1,18 @@
+#!/bin/sh
+# $1 = kernel
+# $2 = file system
+# $3 = source me file
+. ../version
+
+KERNEL=$1
+FILESYSTEM=$2
+SOURCEMEFILE=$3
+
+echo "Installing modules from ${KERNEL} on ${FILESYSTEM}"
+echo "1" > /tmp/result
+. ../${SOURCEMEFILE}
+cd ${KERNEL}
+echo "make modules_install INSTALL_MOD_PATH=${FILESYSTEM}/output/target ARCH=arm64"
+make modules_install INSTALL_MOD_PATH=${FILESYSTEM}/output/target ARCH=arm64
+[ ! "$?" = "0" ] && exit
+echo "0" > /tmp/result

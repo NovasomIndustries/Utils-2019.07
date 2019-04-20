@@ -1,0 +1,32 @@
+#!/bin/sh
+# ${1} is file system name
+# ${2} is the REFERENCE_SERVER IP
+# ${3} is the BOARD_NAME
+
+. ../version
+echo "1" > /tmp/result
+PREPEND_PATH="/Devel/NOVAsdk${VERSION}/FileSystem"
+FSNAME=$1
+IP=$2
+echo ""
+echo "*******************************"
+echo "**** File system Name : $1 ****"
+echo "**** Assigned IP      : $2 ****"
+echo "**** Board            : $3 ****"
+echo "*******************************"
+cd ${PREPEND_PATH}/${FSNAME}
+case $3 in
+	"P" ) 	
+		cp -r /Devel/NOVAsdk${VERSION}/Utils/FsBsp/novasis/NOVAsomP/Init/* board/novasis/NOVAsomP/Init/.
+		echo "REFERENCE_SERVER=${2}" > board/novasis/NOVAsomP/Init/etc/sysconfig/system_vars
+	;;
+	"U" ) 	
+		cp -r /Devel/NOVAsdk${VERSION}/Utils/FsBsp/novasis/NOVAsomU/Init/* board/novasis/NOVAsomP/Init/.
+		echo "REFERENCE_SERVER=${2}" > board/novasis/NOVAsomU/Init/etc/sysconfig/system_vars
+	;;
+esac
+
+[ -d output/target/etc/sysconfig/system_vars ] && echo "REFERENCE_SERVER=${2}" > output/target/etc/sysconfig/system_vars
+make
+[ "$?" != "0" ] && exit
+echo "0" > /tmp/result

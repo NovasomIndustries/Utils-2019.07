@@ -1,0 +1,4 @@
+export ARCH=arm64
+export PATH=$PATH:/Devel/NOVAsdk/Xcompiler/aarch64-arm-gcc-6.4.0/bin
+export CROSS_COMPILE=aarch64-buildroot-linux-gnu-
+

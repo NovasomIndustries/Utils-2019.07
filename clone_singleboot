@@ -1,0 +1,8 @@
+#!/bin/sh
+# $1 is boot to clone
+# $2 is the link name
+VERSION="2019.01"
+cd /Devel/NOVAsdk${VERSION}/Bootloader
+[ ! -d ${1} ] && ln -s ${1} ${2}
+[ ! -d ${1} ] && git clone https://github.com/NovasomIndustries/${1}.git
+

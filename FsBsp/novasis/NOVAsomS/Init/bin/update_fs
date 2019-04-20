@@ -1,0 +1,8 @@
+#!/bin/sh
+get_exec uInitrd       
+rm -rf /tmp/update_dir
+mkdir /tmp/update_dir
+mount /dev/mmcblk2p1 /tmp/update_dir
+cp /tmp/uInitrd /tmp/update_dir/.       
+umount /tmp/update_dir
+

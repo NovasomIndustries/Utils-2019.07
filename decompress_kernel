@@ -1,0 +1,8 @@
+#!/bin/sh
+cd /Devel/NOVAsdk/Kernel
+echo 0 > /tmp/result
+[ -d $1 ] && return 0
+tar jxf $1.tar.bz2
+echo 0 > /tmp/result
+
+

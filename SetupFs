@@ -1,0 +1,123 @@
+#!/bin/bash
+# $1 : file system name
+# $2 : board name
+# $3 : desired configuration
+BR_VERSION="2018.02.12"
+BR="buildroot-${BR_VERSION}"
+BSP_DIR="FsBsp"
+PATCH_DIR="Patches"
+IS_M7=0
+
+. ./version
+
+subst_config()
+{
+        SED_STRING="s/${1}=\([a-z]*\).*/${1}=\"${2}\"/g"
+        cat .config | sed $SED_STRING > aa.config
+        mv aa.config .config
+}
+
+echo "1" > /tmp/result
+if [ "${1}" = "" ]; then
+        echo "File system name is missing, givin' up"
+        exit
+fi
+if [ -d ${1} ]; then
+        rm -rf $1
+fi
+
+if [ "${3}" = "" ]; then
+	case $2 in
+		"P" ) 	BUILDROOT_CFG_BASE="PClass_Buildroot_Base.config"
+				BUSYBOX_CFG_BASE="PClass_BusyBox_Base.config"
+		;;
+		"U5" )	BUILDROOT_CFG_BASE="U5Class_Buildroot_Base.config"
+				BUSYBOX_CFG_BASE="U5Class_BusyBox_Base.config"
+		;;
+		"M8" )	BUILDROOT_CFG_BASE="M8Class_Buildroot_Base.config"
+				BUSYBOX_CFG_BASE="M8Class_BusyBox_Base.config"
+		;;
+		"N1" )	BUILDROOT_CFG_BASE="N1Class_Buildroot_Base.config"
+				BUSYBOX_CFG_BASE="N1Class_BusyBox_Base.config"
+		;;
+		"M7" )	BUILDROOT_CFG_BASE="M7Class_Buildroot_Base_aarch64.config"
+				BUSYBOX_CFG_BASE="M7Class_BusyBox_Base.config"
+				IS_M7=1
+		;;
+		* ) 		BUILDROOT_CFG_BASE="PClass_Buildroot_Base.config"
+				BUSYBOX_CFG_BASE="PClass_BusyBox_Base.config"
+		;;
+	esac
+else
+        BUILDROOT_CFG_BASE=${3}
+	case $2 in
+		"P" ) BUSYBOX_CFG_BASE="PClass_BusyBox_Base.config"
+		;;
+		"U5" ) BUSYBOX_CFG_BASE="U5Class_BusyBox_Base.config"
+		;;
+		"N1" ) BUSYBOX_CFG_BASE="N1Class_BusyBox_Base.config"
+		;;
+		"M8") BUSYBOX_CFG_BASE="M8Class_BusyBox_Base.config"
+		;;
+		"M7") BUSYBOX_CFG_BASE="M7Class_BusyBox_Base.config"
+				IS_M7=1
+		;;
+		* ) 	     BUSYBOX_CFG_BASE="PClass_BusyBox_Base.config"
+		;;
+	esac
+fi
+echo ${BUILDROOT_CFG_BASE}
+echo ${BUSYBOX_CFG_BASE}
+
+cd /Devel/NOVAsdk/FileSystem
+cp /Devel/NOVAsdk/Utils/BuildRoot/${BR}.tar.bz2 .
+tar jxf ${BR}.tar.bz2
+rm ${BR}.tar.bz2
+mv ${BR} ${1}
+cd ${1}
+cp -r /Devel/NOVAsdk/Utils/${BSP_DIR}/novasis board/novasis
+echo $PATCH_FILES
+if [ -f "/Devel/NOVAsdk/Utils/${PATCH_DIR}/*.patch" ]; then
+	PATCH_FILES=`ls /Devel/NOVAsdk/Utils/${PATCH_DIR}/*.patch`
+	for i in ${PATCH_FILES}; do
+        	patch -p1 -f --quiet < ${i}
+	done
+fi
+
+cp /Devel/NOVAsdk/Utils/Configurations/${BUILDROOT_CFG_BASE} .config
+cp /Devel/NOVAsdk/Utils/Configurations/${BUSYBOX_CFG_BASE} BusyBox.config
+# This is for M7 only
+[ "$IS_M7" = "1" ] && cp -a /Devel/NOVAsdk/Utils/rock/buildroot_package_rockchip package/rockchip
+[ "$IS_M7" = "1" ] && cp /Devel/NOVAsdk/Utils/rock/Config.in package/.
+# This is for M7 only END
+
+# Patches, standard files
+FILESTOPATCH="rtl8723bs_bt"
+for i in ${FILESTOPATCH}; do
+	rm -rf package/${i}
+	cp -r /Devel/NOVAsdk/Utils/Patches/${i} package/.
+done
+# Patches, rockchip files
+FILESTOPATCH="gst1-libav-rk"
+if [ "$IS_M7" = "1" ]; then
+	cd package/rockchip
+	for i in ${FILESTOPATCH}; do
+		rm -rf ${i}
+		cp -r /Devel/NOVAsdk/Utils/Patches/rockchip/${i} .
+	done
+	cd ../..
+fi
+
+if [ "$IS_M7" = "0" ]; then
+	cp /Devel/NOVAsdk/Utils/Patches/stdConfig.in package/Config.in
+fi
+# Patches, standard files END
+
+subst_config "BR2_TARGET_GENERIC_HOSTNAME" ${1}
+subst_config "BR2_TARGET_GENERIC_ISSUE" "Welcome"
+subst_config "BR2_PACKAGE_BUSYBOX_CONFIG" "\.\/BusyBox\.config"
+cd ..
+echo "Done"
+echo 0 > /tmp/result
+
+

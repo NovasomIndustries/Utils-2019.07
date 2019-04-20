@@ -1,0 +1,21 @@
+#!/bin/sh
+get_exec P_zImage
+[ "$?" = "1" ] && exit 1
+get_exec imx6q-novasomP.dtb
+[ "$?" = "1" ] && exit 1
+get_exec imx6sdl-novasomP.dtb
+[ "$?" = "1" ] && exit 1
+get_exec NOVAsomParams
+[ "$?" = "1" ] && exit 1
+get_exec u-boot.img
+[ "$?" = "1" ] && exit 1
+rm -rf /tmp/update_dir
+mkdir /tmp/update_dir
+mount /dev/mmcblk0p1 /tmp/update_dir
+cp /tmp/P_zImage /tmp/update_dir/zImage
+cp /tmp/imx6q-novasomP.dtb /tmp/update_dir/.
+cp /tmp/imx6sdl-novasomP.dtb /tmp/update_dir/.
+cp /tmp/NOVAsomParams /tmp/update_dir/.
+cp /tmp/u-boot.img /tmp/update_dir/.
+umount /tmp/update_dir
+

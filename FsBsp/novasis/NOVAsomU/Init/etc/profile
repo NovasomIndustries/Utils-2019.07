@@ -1,0 +1,30 @@
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+if [ "$PS1" ]; then
+	if [ "`id -u`" -eq 0 ]; then
+		export PS1='# '
+	else
+		export PS1='$ '
+	fi
+fi
+
+export PAGER='/bin/more '
+export EDITOR='/bin/vi'
+dmesg | grep 2007 >/dev/null 2>&1
+
+if [ "$?" = "0" ]; then
+	export TSLIB_TSDEVICE=/dev/input/event2
+	export QT_QPA_FB_TSLIB=1
+	export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event2:inverty	
+else
+	export TSLIB_TSDEVICE=/dev/input/event1
+fi
+
+# Source configuration files from /etc/profile.d
+for i in /etc/profile.d/*.sh ; do
+	if [ -r "$i" ]; then
+		. $i
+	fi
+	unset i
+done
+export NODE_PATH=/usr/lib/node_modules

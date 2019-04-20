@@ -1,0 +1,16 @@
+setvideo_hdmiFHD60=setenv videomode video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 fbmem=32M dmfc=3 
+setvideo_hdmiFHD50=setenv videomode video=mxcfb0:dev=hdmi,1920x1080M@50,if=RGB24 fbmem=32M dmfc=3
+setvideo_hdmiFHD30=setenv videomode video=mxcfb0:dev=hdmi,1920x1080M@30,if=RGB24 fbmem=32M dmfc=3
+setvideo_hdmiHD60=setenv videomode  video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 fbmem=32M dmfc=3
+setvideo_hdmiHD50=setenv videomode  video=mxcfb0:dev=hdmi,1280x720M@50,if=RGB24 fbmem=32M dmfc=3
+setvideo_hdmiHD30=setenv videomode  video=mxcfb0:dev=hdmi,1280x720M@30,if=RGB24 fbmem=32M dmfc=3
+setvideo_lvds800x480=setenv  videomode video=mxcfb0:dev=ldb,LVDS-wvga800x480, if=RGB666 fbmem=32M dmfc=3
+setvideo_lvds800x600=setenv  videomode video=mxcfb0:dev=ldb,LVDS-svga800x600, if=RGB666 fbmem=32M dmfc=3
+setvideo_lvds1024x600=setenv videomode video=mxcfb0:dev=ldb,LVDS-wsvga1024x600, if=RGB666 fbmem=32M dmfc=3
+setvideo_lvds1024x768=setenv videomode video=mxcfb0:dev=ldb,LVDS-xga1024X768, if=RGB666 fbmem=32M dmfc=3
+setvideo_lvds1280x800=setenv videomode video=mxcfb0:dev=ldb,LVDS-wxga1280x800,if=RGB24 fbmem=32M dmfc=3
+setvideo_lvds1920x1080B18=setenv videomode video=mxcfb0:dev=ldb,LDB-1080P60,if=RGB666 ldb=spl0 fbmem=32M dmfc=3
+setvideo_lvds1920x1080B24=setenv videomode video=mxcfb0:dev=ldb,LDB-1080P60,if=RGB24 ldb=spl0 fbmem=32M dmfc=3
+setboardargs=setenv bootargs console=${console},${baudrate} root=${ramroot} ${videomode} ramdisk_size=${rdsize} consoleblank=0 vt.global_cursor_default=0;
+uenvcmd=run setramsize;run setvideo_lvds1024x600; run setboardargs ; run mmcloadfdt ; run mmcloadimage ; run mmcloadinitrd ; bootz ${loadaddr} ${fsaddr} ${fdt_addr}
+

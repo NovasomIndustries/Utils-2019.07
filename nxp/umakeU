@@ -1,0 +1,14 @@
+#!/bin/sh
+. ../SourceMe32
+. ../version
+
+echo "1" > /tmp/result
+cd /Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomU-2016.03
+make distclean
+make mrproper
+make novasomu_defconfig
+make -j32
+[ "$?" = "1" ] && exit
+cp u-boot.imx ../../Blobs/u-uboot.imx
+echo "0" > /tmp/result
+

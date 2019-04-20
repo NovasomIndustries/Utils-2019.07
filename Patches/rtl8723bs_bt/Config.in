@@ -1,0 +1,6 @@
+config BR2_PACKAGE_RTL8723BS_BT
+	bool "rtl8723bs_bt"
+	help
+	  rtl8723bs bt driver
+
+          https://github.com/lwfinger/rtl8723bs_bt

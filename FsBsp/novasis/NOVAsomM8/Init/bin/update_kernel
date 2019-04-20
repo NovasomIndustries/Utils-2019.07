@@ -1,0 +1,12 @@
+#!/bin/sh
+get_exec M8_Image
+[ "$?" = "1" ] && exit 1
+get_exec apq8016-sbc.dtb
+[ "$?" = "1" ] && exit 1
+rm -rf /tmp/update_dir
+mkdir /tmp/update_dir
+mount /dev/mmcblk1p9 /tmp/update_dir
+cp /tmp/M8_Image /tmp/update_dir/NOVAboot/Image
+cp /tmp/apq8016-sbc.dtb /tmp/update_dir/NOVAboot/.
+umount /tmp/update_dir
+

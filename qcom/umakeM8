@@ -1,0 +1,20 @@
+#!/bin/sh
+. ../version
+cp -r /Devel/NOVAsdk${VERSION}/Utils/qcom/pylibfdt /Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomM8-2017.11/lib/libfdt/.
+. /Devel/NOVAsdk${VERSION}/Utils/SourceMe64
+cd /Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomM8-2017.11
+touch rd
+echo "1" > /tmp/result
+make distclean
+[ "$?" != "0" ] && exit
+make mrproper
+[ "$?" != "0" ] && exit
+make dragonboard410c_defconfig
+[ "$?" != "0" ] && exit
+make -j32
+[ "$?" != "0" ] && exit
+./dtbTool -o dt.img arch/arm/dts
+rm /Devel/NOVAsdk${VERSION}/Utils-1.0.5/qcom/qcom_bootloaders/u-boot.img
+./mkbootimg --kernel=u-boot-dtb.bin --output=/Devel/NOVAsdk${VERSION}/Utils-1.0.5/qcom/qcom_bootloaders/u-boot.img --dt=dt.img --pagesize 2048 --base 0x80000000 --ramdisk=rd --cmdline=""
+
+echo "0" > /tmp/result

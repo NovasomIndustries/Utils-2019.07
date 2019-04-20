@@ -1,0 +1,7 @@
+#!/bin/sh
+# $1 = kernel
+# $2 = source me file
+# $3 = defconfig file
+
+echo "Rebuild all"
+./kmake $1 $2 $3

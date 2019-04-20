@@ -14,5 +14,3 @@ See also the list of [contributors](https://gitlab.com/NovasomIndustries/Doc/con
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-# Utils-2019.07
-# Utils-2019.07

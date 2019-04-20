@@ -1,0 +1,17 @@
+#!/bin/sh
+. ./version
+cd /Devel/NOVAsdk${VERSION}/Kernel
+echo -n "Looking for $1 on Novasom Industries github ..."
+curl -s https://api.github.com/repos/Novasomindustries/${1}_${VERSION} > present
+cat present | grep message
+[ "$?" = "0" ] && echo "1" > /tmp/result
+[ "$?" = "0" ] && exit 1
+echo "Found!"
+git clone https://github.com/NovasomIndustries/${1}_${VERSION}.git
+cd /Devel/NOVAsdk${VERSION}/Kernel
+rm -f ${1}
+ln -s ${1}_${VERSION} ${1}
+echo "0" > /tmp/result
+exit 0
+
+

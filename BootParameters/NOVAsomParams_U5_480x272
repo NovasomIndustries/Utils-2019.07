@@ -1,0 +1,4 @@
+setvideo_lcd480x272=setenv  videomode video=mxcfb0:dev=lcd,800x480M@60 if=RGB666 fbmem=28M;
+setboardargs=setenv bootargs console=${console},${baudrate} root=/dev/ram rootwait rw ${videomode} ramdisk_size=${rdsize} consoleblank=0 vt.global_cursor_default=0;
+uenvcmd=run setramsize;run setvideo_lcd480x272; run setboardargs ; run mmcloadfdt ; run mmcloadimage ; run mmcloadinitrd ; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}
+

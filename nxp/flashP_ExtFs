@@ -1,0 +1,133 @@
+#!/bin/bash
+# ${1} is the device
+# ${2} is the pointer to the external file system
+EXTFS_FILENAME=`basename ${2}`
+EXTFS_DIRNAME=`dirname ${2}`
+FULL_PATH_PTR=${2}
+. ../version
+echo "Params : $1 $2"
+echo "Device : $1"
+echo "External file system name : $EXTFS_FILENAME"
+echo "External file system directory :  $EXTFS_DIRNAME"
+
+UBOOT_IMG="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasom-2015.04/NOVAsomP/u-boot.img"
+SPL_FILE="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasom-2015.04/NOVAsomP/SPL"
+pushd /Devel/NOVAsdk${VERSION}/Kernel/linux-imx_3.10.53_1.1.0_ga
+./dtbmake
+popd
+
+FILES="${UBOOT_IMG} ${FULL_PATH_PTR}/NOVAsomKernel ${FULL_PATH_PTR}/NOVAsomParams ${FULL_PATH_PTR}/${EXTFS_FILENAME}*.tar.bz2"
+for i in ${FILES}; do
+        if [ ! -f ${i} ]; then
+                echo "File $i not found. Givin'up"
+		return 1
+        else
+                echo "File $i present"
+        fi
+done
+
+cd /Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasom-2015.04
+DISK=${1}
+[ "${1}" = "" ] && DISK="/dev/sdb"
+
+[ ! -b ${DISK} ] && echo "${DISK} not found"
+[ ! -b ${DISK} ] && return 1
+sudo umount ${DISK}* >/dev/null 2>&1
+echo "Writing NOVAsomP uSD"
+sleep 1
+sudo echo -n "Writing u-boot ... "
+sudo dd if=/dev/zero of=${DISK} bs=4M count=1 status=progress; sync
+sudo dd if=${SPL_FILE} of=${DISK} bs=1k seek=1 status=progress; sync
+sync
+
+sudo fdisk ${DISK} << __EOF__
+d
+1
+d
+2
+d
+3
+d
+4
+n
+p
+1
+
++192M
+t
+b
+n
+p
+2
+
+
+t
+2
+83
+w
+__EOF__
+
+sync
+sleep 1
+echo y | sudo mkfs.vfat -F 16 ${DISK}1 -n BOOT 
+RET=$?
+echo "mkfs.vfat returned $RET"
+if ! [ "$?" = "0" ]; then
+	echo "mkfs.vfat with error $RET"
+	return 1
+fi
+
+echo y | sudo mkfs.ext3 -t ext3 -L P6Config ${DISK}2
+RET=$?
+echo "mkfs.ext3 returned $RET"
+if ! [ "$?" = "0" ]; then
+	echo "mkfs.ext3 with error $RET"
+	return 1
+fi
+
+sync
+cp tools/logos/novasomp.bmp .
+rm novasomp.bmp.gz
+gzip novasomp.bmp
+sudo rm -rf tmpmount
+mkdir tmpmount
+sleep 1
+sudo mount ${DISK}1 tmpmount
+[ "$?" != "0" ] && return 1
+sudo rm -rf tmpmount/*
+echo -n "Copying ${UBOOT_IMG} ..."
+sudo cp ${UBOOT_IMG} tmpmount/.
+echo "Done"
+[ "$?" != "0" ] && return 1
+
+FILES="${UBOOT_IMG} ${FULL_PATH_PTR}/NOVAsomKernel ${FULL_PATH_PTR}/NOVAsomParams ${FULL_PATH_PTR}/${EXTFS_FILENAME}*.tar.bz2"
+for i in ${FILES}; do
+	if [ ! -f ${i} ]; then
+		echo "File $i not found. Givin'up"
+	fi
+done
+echo -n "Copying dtbs ..."
+DTB_FILES_PTR="/Devel/NOVAsdk${VERSION}/Kernel/linux-imx_3.10.53_1.1.0_ga/arch/arm/boot/dts"
+sudo cp ${DTB_FILES_PTR}/imx6q-novasomP_NOEMMC.dtb tmpmount/imx6q-novasomP.dtb
+sudo cp ${DTB_FILES_PTR}/imx6sdl-novasomP_NOEMMC.dtb tmpmount/imx6sdl-novasomP.dtb
+echo "Done"
+echo -n "Copying NOVAsomKernel ..."
+sudo cp ${FULL_PATH_PTR}/NOVAsomKernel tmpmount/.
+[ "$?" != "0" ] && return 1
+echo "Done"
+echo -n "Copying NOVAsomParams ..."
+sudo cp ${FULL_PATH_PTR}/NOVAsomParams tmpmount/.
+[ "$?" != "0" ] && return 1
+echo "Done"
+sudo umount tmpmount
+sync
+
+sudo mount -t ext4 ${DISK}2 tmpmount
+echo "Populating file system from ${FULL_PATH_PTR}/${EXTFS_FILENAME}*.tar.bz2"
+sudo tar jxf ${FULL_PATH_PTR}/${EXTFS_FILENAME}*.tar.bz2  -C tmpmount
+sync
+sudo umount tmpmount
+sync
+sudo echo 1 > /tmp/result
+
+return 0

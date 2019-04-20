@@ -1,0 +1,20 @@
+#!/bin/sh
+. /Devel/NOVAsdk/Utils/version
+cd /Devel/NOVAsdk${VERSION}/Bootloader
+[ ! -d u-boot-novasomU-2016.03_${VERSION} ] && ln -s u-boot-novasomU-2016.03_${VERSION} u-boot-novasomU-2016.03
+[ ! -d u-boot-novasomU-2016.03_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomU-2016.03_${VERSION}.git
+echo "U done"
+[ ! -d u-boot-novasomP-2015.04_${VERSION} ] && ln -s u-boot-novasomP-2015.04_${VERSION} u-boot-novasomP-2015.04
+[ ! -d u-boot-novasomP-2015.04_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomP-2015.04_${VERSION}.git
+echo "P done"
+[ ! -d u-boot-novasomM8-2017.11_${VERSION} ] && ln -s u-boot-novasomM8-2017.11_${VERSION} u-boot-novasomM8-2017.11
+[ ! -d u-boot-novasomM8-2017.11_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomM8-2017.11_${VERSION}.git
+echo "M8 done"
+
+[ ! -d u-boot-novasomM7-2017.09_${VERSION} ] && ln -s u-boot-novasomM7-2017.09_${VERSION} u-boot-novasomM7-2017.09
+[ ! -d u-boot-novasomM7-2017.09_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomM7-2017.09_${VERSION}.git
+echo "M7 done"
+[ ! -d u-boot-novasomN1-2018.03_${VERSION} ] && ln -s u-boot-novasomN1-2018.03_${VERSION} u-boot-novasomN1-2017.11
+[ ! -d u-boot-novasomN1-2018.03_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomN1-2018.03_${VERSION}.git
+echo "N1 done"
+

@@ -1,0 +1,4 @@
+console=ttyS0,115200
+boardargs=setenv bootargs console=${console} root=${ramroot} ramdisk_size=${rdsize} quiet earlycon=uart8250,mmio,0x21c0500 lpj=250000;
+uenvcmd=pfe stop; run setramsize ;run boardargs; run mmcloadimage;run mmcloadfdt;run mmcloadinitrd;run board_boot;
+

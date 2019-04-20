@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/main/mainwidUp_bg.jpg</file>
+        <file>image/main/btn_close (1).png</file>
+        <file>image/main/btn_close (2).png</file>
+        <file>image/main/btn_close (3).png</file>
+        <file>image/main/btn_mini (1).png</file>
+        <file>image/main/btn_mini (2).png</file>
+        <file>image/main/btn_mini (3).png</file>
+        <file>image/main/btn_mobile (1).png</file>
+        <file>image/main/btn_mobile (2).png</file>
+        <file>image/main/btn_mobile (3).png</file>
+        <file>image/main/btn_setting (1).png</file>
+        <file>image/main/btn_setting (2).png</file>
+        <file>image/main/btn_setting (3).png</file>
+        <file>image/main/btnborder.png</file>
+        <file>image/main/icon_music.png</file>
+        <file>image/main/icon_guide.png</file>
+        <file>image/main/icon_video.png</file>
+        <file>image/main/return.png</file>
+        <file>image/main/icon_setting.png</file>
+        <file>image/main/icon_gallery.png</file>
+        <file>image/main/return_big.png</file>
+        <file>image/main/hour_pointer.png</file>
+        <file>image/main/icon_easy_connect.png</file>
+        <file>image/main/icon_radio.png</file>
+        <file>image/main/mini_pointer.png</file>
+        <file>image/main/sec_pointer.png</file>
+        <file>image/main/loading.gif</file>
+        <file>image/main/icon_carplay.png</file>
+    </qresource>
+</RCC>

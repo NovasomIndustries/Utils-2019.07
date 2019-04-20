@@ -1,0 +1,50 @@
+#!/bin/sh
+# $1 = kernel
+# $2 = source me file
+# $3 = if null is a standard compile else contains a .config
+
+KERNEL=$1
+SOURCEMEFILE=$2
+CONFIG_FILE=$3
+
+cleanup_and_configure() {
+	echo "Cleanup"
+	make mrproper
+	make distclean
+	echo "Config is ${CONFIG_FILE}"
+	if [ "$KERNEL" = "$LAYERSCAPE" ]; then
+		make NOVAsomN1_defconfig
+	else
+		make ${CONFIG_FILE}
+	fi
+}
+
+echo "Working on ${KERNEL} with ${SOURCEMEFILE}"
+echo "1" > /tmp/result
+. ../${SOURCEMEFILE}
+cd ../../Kernel/${KERNEL}
+if [ "$KERNEL" = "linux-imx_4.1.15_1.2.0_ga" ]; then
+	! [ -z "${CONFIG_FILE}" ] && cleanup_and_configure
+	make -j32 zImage modules
+	[ ! "$?" = "0" ] && exit
+	cd kernel-module-imx-gpu-viv
+	export KERNEL_SRC=..
+	make -j32
+	[ ! "$?" = "0" ] && exit
+	cd ..
+	cp arch/arm/boot/zImage ../../Blobs/linux-nxp_p-4.1.15.2_zImage
+	cd ../../Deploy
+	rm P_zImage
+	ln -s ../Kernel/${KERNEL}/arch/arm/boot/zImage P_zImage
+else
+	! [ -z "${CONFIG_FILE}" ] && cleanup_and_configure
+	make -j32 zImage
+	[ ! "$?" = "0" ] && exit
+	make -j32 modules
+	[ ! "$?" = "0" ] && exit
+	cp arch/arm/boot/zImage ../../Blobs/linux-nxp_u-4.1.43_zImage
+	cd ../../Deploy
+	rm U_zImage
+	ln -s ../Kernel/${KERNEL}/arch/arm/boot/zImage U_zImage
+fi
+echo "0" > /tmp/result

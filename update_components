@@ -1,0 +1,6 @@
+#!/bin/sh
+cd /Devel/NOVAsdk/Utils
+./update_others
+./update_boot  
+./update_kernel  
+

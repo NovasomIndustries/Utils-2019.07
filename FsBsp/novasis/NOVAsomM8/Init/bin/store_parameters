@@ -1,0 +1,9 @@
+#!/bin/sh
+rm -rf /tmp/tmpmount
+mkdir /tmp/tmpmount
+mount /dev/mmcblk1p10 /tmp/tmpmount
+mkdir -p /tmp/tmpmount/sysconfig
+cp -r /etc /tmp/tmpmount/sysconfig/.
+cp -r /root /tmp/tmpmount/sysconfig/.
+umount /tmp/tmpmount
+rm -rf /tmp/tmpmount

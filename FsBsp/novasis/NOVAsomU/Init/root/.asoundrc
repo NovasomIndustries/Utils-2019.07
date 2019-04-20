@@ -1,0 +1,28 @@
+pcm.sgtl5000 {
+        type hw
+        card 0
+        channels 2
+}
+ctl.sgtl5000 {
+        type hw
+        card 0
+        channels 2
+}
+pcm.copy {
+        type plug
+        slave {
+                pcm hw
+        }
+        route_policy copy
+}
+pcm.!default {
+        type hw
+        card 0
+        channels 2
+}
+ctl.!default {
+        type hw
+        card 0
+        channels 2
+}
+

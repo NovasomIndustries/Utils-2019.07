@@ -1,0 +1,15 @@
+#!/bin/sh
+BUILDROOT="buildroot-2017.11"
+REFERENCE_FS="P_Gstreamer"
+HERE=`pwd`
+cd ../FileSystem
+echo -n "Cleaning up ..."
+rm -rf Patches
+echo "Done"
+echo -n "Uncompressing ${BUILDROOT}.tar.bz2 ..."
+tar jxf ${BUILDROOT}.tar.bz2
+echo "Done"
+
+echo -n "Creating Novasis's patches from ${REFERENCE_FS} against ${BUILDROOT} ..."
+diff -Naur -x gcc ${BUILDROOT}/package ${REFERENCE_FS}/package > ${HERE}/Patches/001-Novasis-Multimedia.patch
+echo "Done"

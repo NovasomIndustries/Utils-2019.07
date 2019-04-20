@@ -1,0 +1,2 @@
+setboardargs=setenv bootargs console=ttyFIQ0,115200 root=/dev/mmcblk0p5 rootwait rw quiet
+uenvcmd=run setboardargs ; run mmcloadfdt ; run mmcloadimage ; booti ${loadaddr} - ${fdt_addr}

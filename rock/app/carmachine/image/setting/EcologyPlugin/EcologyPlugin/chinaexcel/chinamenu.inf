@@ -1,0 +1,21 @@
+[version] 
+; version signature (same for both NT and Win95) do not remove
+signature="$CHICAGO$"
+AdvancedINF=2.0  
+
+[Add.Code]
+chinamenu.dll=chinamenu.dll
+txml.dll=txml.dll
+
+[chinamenu.dll]
+file-win32-x86=thiscab
+clsid={AC62F1B9-8FDE-4FB5-8BE1-2DF0F3FED156} 
+FileVersion=1,0,2,0
+RegisterServer=yes
+
+; needed DLL
+[txml.dll]
+file-win32-x86=thiscab
+FileVersion=2,1,6,0
+DestDir=11
+RegisterServer=no 

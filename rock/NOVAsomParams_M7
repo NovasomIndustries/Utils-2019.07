@@ -1,0 +1,2 @@
+boardarsg_env=setenv bootargs console=ttyFIQ0,115200 root=/dev/ram ramdisk_size=512000 quiet
+uenvcmd=run boardarsg_env ; run mmcloadfdt; run mmcloadimage; run mmcloadinitrd; booti ${loadaddr} ${fsaddr} ${fdt_addr}

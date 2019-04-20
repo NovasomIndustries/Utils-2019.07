@@ -1,0 +1,21 @@
+#!/bin/sh
+. ../SourceMe32
+. ../version
+BOOT_P="../../Bootloader/u-boot-novasomP-2015.04"
+echo "1" > /tmp/result
+cd ${BOOT_P}
+make distclean
+[ "$?" != "0" ] && exit
+make mrproper
+[ "$?" != "0" ] && exit
+make novasomp_defconfig
+[ "$?" != "0" ] && exit
+make -j32
+[ "$?" != "0" ] && exit
+cp u-boot.img ../../Blobs/p-uboot.img
+cp SPL ../../Blobs/p-SPL
+cd /Devel/NOVAsdk${VERSION}/Deploy
+rm -f u-boot.img SPL
+ln -s ${BOOT_P}/u-boot.img
+ln -s ${BOOT_P}/SPL
+echo "0" > /tmp/result

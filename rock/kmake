@@ -1,0 +1,33 @@
+#!/bin/sh
+# $1 = kernel
+# $2 = source me file
+
+KERNEL=$1
+SOURCEMEFILE=$2
+DEFCONFIG=$3
+
+cleanup_and_configure() {
+        make mrproper
+        make distclean
+        make ${DEFCONFIG}
+}
+
+echo "Working on ${KERNEL} with ${SOURCEMEFILE}"
+echo "1" > /tmp/result
+. ../${SOURCEMEFILE}
+cd ../../Kernel/${KERNEL}
+! [ -z "${DEFCONFIG}" ] && cleanup_and_configure
+[ -d .git ] && mv .git gitb.git
+make -j32
+[ ! "$?" = "0" ] && exit
+make -j32 modules
+[ ! "$?" = "0" ] && exit
+make rockchip/rk3328-novasomm7.dtb
+mv gitb.git .git
+cd ../../Deploy
+rm m7_Image m7_dtb.dtb m7.kernel.config
+ln -s ../Kernel/${KERNEL}/arch/arm64/boot/Image m7_Image
+ln -s ../Kernel/${KERNEL}/.config m7.kernel.config
+ln -s ../Kernel/${KERNEL}/arch/arm64/boot/dts/rockchip/rk3328-novasomm7.dtb m7_dtb.dtb
+sync
+echo "0" > /tmp/result

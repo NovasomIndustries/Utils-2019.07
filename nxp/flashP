@@ -1,0 +1,106 @@
+#!/bin/sh
+# ${1} is number of user partition
+# ${2} is size of first user partition, if enabled
+# ${3} is size of second user partition, if enabled
+# ${4} is the device
+# ${5} is the dtb for solo/dl
+# ${6} is the dtb for quad
+# ${7} is the NOVAsomParams file
+# ${8} is the ramdisk size
+
+. ./functions
+. ../version
+
+DISK=${4}
+sync
+sudo umount ${DISK}* >/dev/null 2>&1
+sync
+
+SPL_FILE="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomP-2015.04/SPL"
+UBOOT_IMG="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomP-2015.04/u-boot.img"
+KERNEL="/Devel/NOVAsdk${VERSION}/Blobs/linux-nxp_p-4.1.15.2_zImage"
+DTB_FILESDL="/Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${5}"
+DTB_FILEQ="/Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${6}"
+UINITRD="/Devel/NOVAsdk${VERSION}/Deploy/uInitrd"
+NOVASOMPARAMS="/Devel/NOVAsdk${VERSION}/Utils/BootParameters/$7"
+DEPLOY_DIR="/Devel/NOVAsdk${VERSION}/Deploy"
+RAMDISK_SIZE="$8"
+echo "NOVASOMPARAMS is $NOVASOMPARAMS"
+
+
+echo "1" > /tmp/result
+
+FILES="$SPL_FILE $UBOOT_IMG $KERNEL $DTB_FILESDL $DTB_FILEQ $UINITRD $NOVASOMPARAMS"
+for i in ${FILES}; do
+	if ! [ -f ${i} ]; then
+		echo "File ${i} not found"
+		exit
+	fi
+done
+
+if [ ! -b ${DISK} ]; then
+       echo "${DISK} not found"
+       exit
+fi
+
+echo "Everything is ok, proceeding"
+
+sudo umount ${DISK}* >/dev/null 2>&1
+echo "Writing uSD"
+sleep 1
+sudo sgdisk -Z ${DISK} >/dev/null 2>&1
+sudo echo -n "Writing u-boot ... "
+sudo dd if=/dev/zero of=${DISK} bs=4M count=1; sync
+sudo dd if=${SPL_FILE} of=${DISK} bs=1k seek=1; sync
+sync
+echo "Done"
+
+format_usd ${1} ${2} ${3} ${DISK}
+if [ "$?" = "1" ]; then
+	echo "Error formatting uSD!"
+	exit
+fi
+
+rm -rf tmpmount
+mkdir tmpmount
+sleep 1
+sudo mount ${DISK}1 tmpmount
+[ "$?" != "0" ] && exit
+
+echo -n "Copying `basename ${UBOOT_IMG}` ..."
+sudo cp ${UBOOT_IMG} tmpmount/.
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying `basename ${KERNEL}` ..."
+sudo cp ${KERNEL} tmpmount/zImage
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying `basename ${UINITRD}` ..."
+sudo cp ${UINITRD} tmpmount/.
+[ "$?" != "0" ] && exit
+echo -n "Copying `basename ${NOVASOMPARAMS}` ..."
+echo "setramsize=setenv rdsize ${RAMDISK_SIZE}" > ${DEPLOY_DIR}/NOVAsomParams
+cat ${NOVASOMPARAMS} >> ${DEPLOY_DIR}/NOVAsomParams
+sudo cp ${DEPLOY_DIR}/NOVAsomParams tmpmount/.
+[ "$?" != "0" ] && exit
+
+echo -n "Copying `basename ${DTB_FILEQ}` ..."
+sudo cp ${DTB_FILEQ} tmpmount/imx6q-novasomP.dtb
+echo -n "Copying `basename ${DTB_FILESDL}` ..."
+sudo cp ${DTB_FILESDL} tmpmount/imx6sdl-novasomP.dtb
+echo -n "`basename ${DTB_FILESDL}` "
+echo "Done"
+
+sudo umount tmpmount
+sync
+cd ${DEPLOY_DIR}
+rm -f SPL u-boot.img zImage imx6q-novasomP.dtb imx6sdl-novasomP.dtb
+ln -s $SPL_FILE
+ln -s $UBOOT_IMG
+ln -s $KERNEL
+ln -s $DTB_FILESDL imx6sdl-novasomP.dtb
+ln -s $DTB_FILEQ imx6q-novasomP.dtb
+
+
+echo "0" > /tmp/result
+echo "Write finished succesfully"

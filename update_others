@@ -1,0 +1,20 @@
+#!/bin/sh
+. ./version
+UPD_ELEMENTS="Doc Utils"
+
+
+COUNTMODS=0
+COUNTRECV=0
+INCREMENT=1
+
+cd /Devel/NOVAsdk${VERSION}
+for i in ${UPD_ELEMENTS}; do
+	HERE=`pwd`
+	if [ -d ${i} ]; then
+		cd ${i}
+		echo -n "Working on ${i} ... "
+		git pull
+	fi
+	cd ${HERE}
+done
+

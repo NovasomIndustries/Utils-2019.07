@@ -1,0 +1,12 @@
+#!/bin/sh
+get_exec zImage
+get_exec imx6q-novasomS.dtb
+get_exec imx6sdl-novasomS.dtb
+rm -rf /tmp/update_dir
+mkdir /tmp/update_dir
+mount /dev/mmcblk2p1 /tmp/update_dir
+cp /tmp/zImage /tmp/update_dir/.       
+cp /tmp/imx6q-novasomS.dtb /tmp/update_dir/.
+cp /tmp/imx6sdl-novasomS.dtb /tmp/update_dir/.
+umount /tmp/update_dir
+

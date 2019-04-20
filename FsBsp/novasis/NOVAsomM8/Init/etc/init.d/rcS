@@ -1,0 +1,52 @@
+#!/bin/sh
+
+mount /dev/mmcblk1p10 /mnt
+if [ -d /mnt/application_storage ]; then
+	cp -r /mnt/application_storage /tmp/.
+fi
+if [ -d /mnt/sysconfig ]; then
+	# If the file REINIT_VARS is present remove 
+	#  all saved and restart with default values
+	if [ -f /mnt/sysconfig/REINIT_VARS ]; then
+		cp -a /etc /mnt/sysconfig/.
+		cp -a /root /mnt/sysconfig/.
+		rm /mnt/sysconfig/REINIT_VARS
+	else
+		if [ -d /mnt/sysconfig/etc ]; then
+			cp -a /mnt/sysconfig/etc /
+		fi
+
+		if [ -d /mnt/sysconfig/root ]; then
+			cp -a /mnt/sysconfig/root /
+			cp -a /mnt/sysconfig/root /
+		fi
+	fi
+else
+	mkdir /mnt/sysconfig
+	cp -a /etc /mnt/sysconfig/.
+	cp -a /root /mnt/sysconfig/.
+fi
+umount /mnt
+
+# Start all init scripts in /etc/init.d
+# executing them in numerical order.
+#
+for i in /etc/init.d/S??* ;do
+	# Ignore dangling symlinks (if any).
+	[ ! -f "$i" ] && continue
+
+	case "$i" in
+		*.sh)
+			# Source shell script for speed.
+			(
+				trap - INT QUIT TSTP
+				set start
+				. $i
+			)
+			;;
+		*)
+			# No sh extension, so fork subprocess.
+			$i start
+			;;
+	esac
+done

@@ -1,0 +1,4 @@
+export ARCH=arm
+export PATH=$PATH:/Devel/NOVAsdk/Xcompiler/arch32-arm-gcc-5.5.0/bin
+export CROSS_COMPILE=arm-buildroot-linux-gnueabihf-
+export PS1='[SDK32]$ '

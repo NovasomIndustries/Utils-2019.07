@@ -1,0 +1,133 @@
+#!/bin/sh
+# ${1} is number of user partition
+# ${2} is size of first user partition, if enabled
+# ${3} is size of second user partition, if enabled
+# ${4} is the device
+# ${5} is the dtb
+# ${6} is the NOVAsomParams file
+# ${7} is the ramdisk size
+# ./Uflash - 0 0 /dev/sdb"
+
+. ./functions
+. ../version
+
+KERNEL="/Devel/NOVAsdk${VERSION}/Kernel/linux-imx_4.1.43/arch/arm/boot/zImage"
+BOOTLOADER="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomU-2016.03"
+UINITRD="/Devel/NOVAsdk${VERSION}/Deploy/uInitrd"
+UBOOT_IMX="${BOOTLOADER}/u-boot.imx"
+DISK=${4}
+DTB="/Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${5}.dtb"
+NOVASOMPARAMS="/Devel/NOVAsdk${VERSION}/Utils/BootParameters/$6"
+DEPLOY_DIR="/Devel/NOVAsdk${VERSION}/Deploy"
+RAMDISK_SIZE="$7"
+
+echo "1" > /tmp/result
+FILES="$UBOOT_IMX $KERNEL $DTB $UINITRD $NOVASOMPARAMS"
+for i in ${FILES}; do
+        if ! [ -f ${i} ]; then
+                echo "File ${i} not found"
+                exit
+        fi
+done
+
+if [ ! -b ${DISK} ]; then
+	echo "${DISK} not found"
+	exit
+fi
+sudo umount ${DISK}* >/dev/null 2>&1
+echo "Writing NOVAsomU uSD"
+sleep 1
+sudo echo -n "Writing u-boot ... "
+sudo dd if=/dev/zero of=${DISK} bs=4M count=1; sync
+sudo dd if=${UBOOT_IMX} of=${DISK} bs=512 seek=2; sync
+sync
+
+format_usd ${1} ${2} ${3} ${DISK}
+
+sleep 1
+echo y | sudo mkfs.vfat -F 16 ${DISK}1 -n BOOT 
+RET=$?
+echo "mkfs.vfat returned $RET"
+if ! [ "$?" = "0" ]; then
+	echo "mkfs.vfat with error $RET"
+	exit
+fi
+
+echo y | sudo mkfs.ext3 -t ext3 -L U6Config ${DISK}3
+RET=$?
+echo "mkfs.ext3 returned $RET"
+if ! [ "$?" = "0" ]; then
+	echo "mkfs.ext3 with error $RET"
+	exit
+fi
+
+if [ "${1}" = "1" ]; then
+	echo y | sudo sudo mkfs.ext3 -t ext3 -L U6user1 ${DISK}2
+	RET=$?
+	echo "mkfs.ext3 returned $RET"
+	if ! [ "$?" = "0" ]; then
+		echo "mkfs.ext3 with error $RET"
+		exit
+	fi
+fi
+
+if [ "${1}" = "2" ]; then
+	echo y | sudo sudo mkfs.ext3 -t ext3 -L U6user1 ${DISK}4
+	RET=$?
+	echo "mkfs.ext3 returned $RET"
+	if ! [ "$?" = "0" ]; then
+		echo "mkfs.ext3 with error $RET"
+		exit
+	fi
+	echo y | sudo mkfs.ext3 -t ext3 -L U6user2 ${DISK}4
+	RET=$?
+	echo "mkfs.ext3 returned $RET"
+	if ! [ "$?" = "0" ]; then
+		echo "mkfs.ext3 with error $RET"
+		exit
+	fi
+fi
+
+sync
+sudo umount tmpmount >/dev/null 2>&1
+rm -rf tmpmount
+mkdir tmpmount
+sleep 1
+sudo mount ${DISK}1 tmpmount
+[ "$?" != "0" ] && exit
+sudo rm -rf tmpmount/*
+[ "$?" != "0" ] && exit
+echo `pwd`
+echo -n "Copying novasomu.dtb ..."
+sudo cp ${DTB} tmpmount/novasomu.dtb
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying u-boot files ..."
+sudo cp ${UBOOT_IMX} tmpmount/.
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying zImage ..."
+sudo cp ${KERNEL} tmpmount/zImage
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying uInitrd ..."
+sudo cp ${UINITRD} tmpmount/.
+[ "$?" != "0" ] && exit
+echo "Done"
+echo -n "Copying `basename ${NOVASOMPARAMS}` ..."
+echo "setramsize=setenv rdsize ${RAMDISK_SIZE}" > ${DEPLOY_DIR}/NOVAsomParams
+cat ${NOVASOMPARAMS} >> ${DEPLOY_DIR}/NOVAsomParams
+sudo cp ${DEPLOY_DIR}/NOVAsomParams tmpmount/NOVAsomParams
+[ "$?" != "0" ] && exit
+
+
+#sudo cp ../../Bootloader/${BOOTLOADER}/ddr-test-uboot-jtag-mx6ull.bin tmpmount/.
+#sudo cp ../../Bootloader/${BOOTLOADER}/qspi-header.bin tmpmount/qspi-header.bin
+sudo umount tmpmount
+sync
+sudo umount ${DISK}
+sync
+
+echo "0" > /tmp/result
+echo "Write finished succesfully"
+

@@ -1,0 +1,105 @@
+#!/bin/bash
+# ${1} is size of first user partition, if enabled
+# ${2} is the device
+# ${3} is file system dir
+# ${4} is the NOVAsomParams file
+
+SIZE1=${1}
+DISK=${2}
+FILESYSTEM=${3}
+NOVASOM_PARAMS=${4}
+
+KERNEL="linux-rock_m7-4.4.167_Image"
+FILES="../../Blobs/${KERNEL} ../../Blobs/m7-idbloader.img ../../Blobs/m7-uboot.img ../../Blobs/m7-trust.img ../../Blobs/m7_dtb.dtb ${NOVASOM_PARAMS} ${FILESYSTEM}/output/images/rootfs.ext2 rcS_M7_OnSD"
+for i in ${FILES}; do
+	if ! [ -f ${i} ]; then
+		NOTFOUND=`basename ${i}`
+		NOTFOUND=${i}
+		echo "${NOTFOUND} not found. giving up"
+		echo "1" > /tmp/result
+		exit 1
+	fi
+done
+if ! [ -f ../../Deploy/uInitrd ]; then
+	echo "uInitrd not found. giving up"
+	echo "1" > /tmp/result
+	exit 1
+fi
+[ "${DISK}" = "" ] && DISK="/dev/sdb"
+echo -n "Creating basic structure on ${DISK} ... "
+sudo sgdisk -Z ${DISK} > /dev/null 2>&1
+sudo partprobe ${DISK} > /dev/null 2>&1
+echo "Done"
+sync
+echo -n "Creating partitions ... "
+sudo sgdisk -n 1::+7M  -c 1:loader1 ${DISK}  > /dev/null 2>&1
+sudo sgdisk -n 2::+4M  -c 2:loader2 ${DISK}  > /dev/null 2>&1
+sudo sgdisk -n 3::+4M  -c 3:trust ${DISK}  > /dev/null 2>&1
+sudo sgdisk -n 8::+128M -c 8:M7Boot ${DISK}  > /dev/null 2>&1
+sudo sgdisk -n 4::+16M -c 4:config ${DISK}  > /dev/null 2>&1
+sudo sgdisk -n 5::+1024M -c 5:rootfs ${DISK}  > /dev/null 2>&1
+if [ "${SIZE1}" != "0" ]; then
+	sudo sgdisk -n 6::      -c 6:user1 ${DISK}  > /dev/null 2>&1
+else
+	sudo sgdisk -n 6::+${SIZE1}M     -c 6:user1 ${DISK}  > /dev/null 2>&1
+fi
+
+
+sudo sgdisk -A 8:set:2 -t 8:0700 ${DISK}  > /dev/null 2>&1
+sleep 1
+sync
+sleep 1
+sudo partprobe ${DISK} 
+echo "Done"
+echo -n "Storing boot files ... "
+sudo dd if=../../Blobs/m7-idbloader.img of=/dev/sdb seek=64 conv=notrunc  > /dev/null 2>&1
+sudo dd if=../../Blobs/m7-uboot.img of=/dev/sdb seek=16384 conv=notrunc  > /dev/null 2>&1
+sudo dd if=../../Blobs/m7-trust.img of=/dev/sdb seek=24576 conv=notrunc  > /dev/null 2>&1
+sync
+echo "Done"
+echo -n "Formatting and populating partition 4... "
+yes | sudo mkfs.ext4 ${DISK}4
+echo "Done"
+if [ "${USERNUM}" = "1" ]; then
+	echo -n "Formatting and populating partition 5... "
+	yes | sudo mkfs.ext4 ${DISK}5
+	echo "Done"
+fi
+if [ "${USERNUM}" = "2" ]; then
+	echo -n "Formatting and populating partition 5... "
+	yes | sudo mkfs.ext4 ${DISK}5
+	echo "Done"
+	echo -n "Formatting and populating partition 6... "
+	yes | sudo mkfs.ext4 ${DISK}6
+	echo "Done"
+fi
+sync
+echo -n "Formatting and populating partition 8... "
+yes | sudo mkfs.ext2 ${DISK}8
+sync
+rm -rf mdisk ; mkdir mdisk
+sudo mount ${DISK}8 mdisk > /dev/null 2>&1
+sudo cp ../../Blobs/${KERNEL} mdisk/Image
+sudo cp ../../Blobs/m7_dtb.dtb mdisk/dtb.dtb
+sudo cp ${NOVASOM_PARAMS} mdisk/NOVAsomParams
+sudo umount mdisk
+echo "Done"
+
+echo -n "Formatting and populating partition 5... "
+yes | sudo mkfs.ext4 ${DISK}5
+sync
+rm -rf rootfsmount ; mkdir rootfsmount
+sudo mount -t ext4 -o loop ${FILESYSTEM}/output/images/rootfs.ext2 rootfsmount
+sudo mount ${DISK}5 mdisk > /dev/null 2>&1
+sudo cp -a rootfsmount/* mdisk/.
+sudo cp rcS_M7_OnSD mdisk/etc/init.d/rcS
+sync
+sudo umount mdisk
+sudo umount rootfsmount
+sync
+echo "Done"
+
+echo -n "Finishing up ..."
+sync
+echo "Done."
+echo "0" > /tmp/result

@@ -1,0 +1,17 @@
+#!/bin/sh
+# called by usr/share/udhcpc/default.script after the dhcp have a valid ip
+
+. /etc/sysconfig/system_vars
+. /etc/sysconfig/network
+
+#PROGRESS=`cat /tmp/progress`
+for i in /etc/init.d/afterlease_S??* ;do
+	[ ! -f "$i" ] && continue
+	$i start
+done
+
+ifconfig | grep Bcast | awk '{print $2}' | sed 's/addr://g' > /tmp/my_ip
+ifconfig lo up
+sleep 1
+touch /tmp/system_ready
+

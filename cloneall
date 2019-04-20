@@ -1,0 +1,51 @@
+#!/bin/sh
+. ./version
+VERSION="2019.01"
+git clone https://github.com/NovasomIndustries/Utils-${VERSION}.git
+git clone https://github.com/NovasomIndustries/Xcompiler-${VERSION}.git
+HERE=`pwd`
+cd Qt
+git clone https://github.com/NovasomIndustries/NOVAembed-${VERSION}.git
+cd /Devel/NOVAsdk${VERSION}/Qt/build-NOVAembed-Desktop-Debug
+make distclean
+/usr/lib64/qt5/bin/qmake /Devel/NOVAsdk${VERSION}/Qt/NOVAembed/NOVAembed.pro -r -spec linux-g++-64 CONFIG+=debug
+make
+cd /Devel/NOVAsdk${VERSION}/Qt/NOVAembed/NOVAembed_P_Parser
+rm -rf obj bin
+mkdir -p obj bin/Debug
+gcc -Wall -g  -c src/dts_gen.c -o obj/dts_gen.o
+gcc -Wall -g  -c src/iomux.c -o obj/iomux.o
+gcc -Wall -g  -c src/main.c -o obj/main.o
+g++  -o bin/Debug/NOVAembed_P_Parser obj/dts_gen.o obj/iomux.o obj/main.o
+cd /Devel/NOVAsdk${VERSION}/Qt/NOVAembed/NOVAembed_U_Parser
+rm -rf obj bin
+mkdir -p obj bin/Debug
+gcc -Wall -g  -c src/dts_gen.c -o obj/dts_gen.o
+gcc -Wall -g  -c src/iomux.c -o obj/iomux.o
+gcc -Wall -g  -c src/main.c -o obj/main.o
+g++  -o bin/Debug/NOVAembed_U_Parser obj/dts_gen.o obj/iomux.o obj/main.o
+cd /Devel/NOVAsdk${VERSION}/Qt/NOVAembed/NOVAembed_M7_Parser
+rm -rf obj bin
+mkdir -p obj bin/Debug
+gcc -Wall -g  -c src/dts_gen.c -o obj/dts_gen.o
+gcc -Wall -g  -c src/iomux.c -o obj/iomux.o
+gcc -Wall -g  -c src/main.c -o obj/main.o
+g++  -o bin/Debug/NOVAembed_M7_Parser obj/dts_gen.o obj/iomux.o obj/main.o
+cd ${HERE}/Bootloader
+git clone https://github.com/NovasomIndustries/u-boot-novasomP-2015.04_${VERSION}.git
+git clone https://github.com/NovasomIndustries/u-boot-novasomU-2016.03_${VERSION}.git
+git clone https://github.com/NovasomIndustries/u-boot-novasomM8-2017.11_${VERSION}.git
+git clone https://github.com/NovasomIndustries/u-boot-novasomM7-2017.09_${VERSION}.git
+ln -s u-boot-novasomP-2015.04_${VERSION} u-boot-novasomP-2015.04
+ln -s u-boot-novasomU-2016.03_${VERSION} u-boot-novasomU-2016.03
+ln -s u-boot-novasomM8-2017.11_${VERSION} u-boot-novasomM8-2017.11
+ln -s u-boot-novasomM7-2017.09-${VERSION} u-boot-novasomM7-2017.09
+cd ../Kernel
+git clone https://github.com/NovasomIndustries/linux-4.4.167_M7_${VERSION}.git
+git clone https://github.com/NovasomIndustries/linux-4.11.0-QualcommLinaro_${VERSION}.git
+git clone https://github.com/NovasomIndustries/linux-imx_4.1.15_1.2.0_ga_${VERSION}.git
+git clone https://github.com/NovasomIndustries/linux-imx_4.1.43_${VERSION}.git
+ln -s linux-4.11.0-QualcommLinaro_${VERSION} linux-4.11.0-QualcommLinaro
+ln -s linux-imx_4.1.15_1.2.0_ga_${VERSION} linux-imx_4.1.15_1.2.0_ga
+ln -s linux-imx_4.1.43_${VERSION} linux-imx_4.1.43
+ln -s linux-4.4.167_M7_${VERSION} linux-4.4.167_M7

@@ -1,0 +1,21 @@
+#!/bin/bash
+. ./version
+IMAGE="$1"
+echo "Called with $1"
+exit
+OUTPATH="/Devel/NOVAsdk${VERSION}/Kernel/${2}/drivers/video/logo"
+echo $1 $2
+if [ "$1" = "" ]; then
+        echo "Specify an image"
+        exit 0;
+fi
+if [ "$2"  = "" ]; then
+        echo "Specify a kernel"
+        exit 0;
+fi
+echo $1 $2
+OUTPATH="/Devel/NOVAsdk${VERSION}/Kernel/${2}/drivers/video/logo"
+[ ! -f /usr/bin/pngtopnm ] && echo "pngtopnm not found"
+[ ! -f /usr/bin/pngtopnm ] && exit 0
+pngtopnm ${1} | pnmquant 223| pnmtoplainpnm > ${OUTPATH}/logo_linux_clut224.ppm
+

@@ -1,0 +1,57 @@
+#! /bin/sh
+#
+# System-V init script for the openntp daemon
+#
+
+. /etc/sysconfig/network
+. /etc/sysconfig/wireless
+
+[ ! -f /usr/sbin/ntpd ] && return 0
+COUNT=0
+/sbin/hwclock -r
+case "$1" in
+  start)
+        echo "Starting ntpd"
+        IP=`ifconfig | grep Mask | awk '{print $2}' | sed 's/addr://g'`
+        if [ "${WLAN_ENABLED}" = "Y" ]; then
+                while [ "$IP" == "" ]; do
+                        echo "Waiting for IP"
+                        sleep 1
+                        IP=`ifconfig ${WLAN_DEVICE} | grep Mask | awk '{print $2}' | sed 's/addr://g'`
+                        let COUNT=$COUNT+1
+                        if [ ${COUNT} -ge 10 ]; then
+                                break
+                        fi
+                done
+                DEVICE=${WLAN_DEVICE}
+        fi
+        if [ "${ETH0_ENABLED}" = "Y" ]; then
+                while [ "$IP" == "" ]; do
+                        echo "Waiting for IP"
+                        sleep 1
+                        IP=`ifconfig ${NET_DEVICE} | grep Mask | awk '{print $2}' | sed 's/addr://g'`
+                        let COUNT=$COUNT+1
+                        if [ ${COUNT} -ge 10 ]; then
+                                break
+                        fi
+                done
+                DEVICE=${NET_DEVICE}
+        fi
+        /usr/sbin/ntpd -g -I ${DEVICE}
+        /etc/init.d/hwclock_updater &
+        ;;
+  stop) echo "Stopping ntpd"
+        kill -9 `pidof ntpd`
+        ;;
+  restart) echo "Restarting ntpd"
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+  *) echo "Usage: $0 {start|stop|restart|reload|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+

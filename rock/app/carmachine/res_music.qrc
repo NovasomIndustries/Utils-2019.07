@@ -1,0 +1,148 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/music/music_bg.jpg</file>
+        <file>image/music/music_top_icon.png</file>
+        <file>image/music/rerurn.png</file>
+        <file>image/music/btn_download (1).png</file>
+        <file>image/music/btn_download (2).png</file>
+        <file>image/music/btn_download (3).png</file>
+        <file>image/music/btn_download (4).png</file>
+        <file>image/music/btn_equalizer (1).png</file>
+        <file>image/music/btn_equalizer (2).png</file>
+        <file>image/music/btn_equalizer (3).png</file>
+        <file>image/music/btn_equalizer (4).png</file>
+        <file>image/music/btn_listcircle (1).png</file>
+        <file>image/music/btn_listcircle (2).png</file>
+        <file>image/music/btn_listjump (1).png</file>
+        <file>image/music/btn_listjump (2).png</file>
+        <file>image/music/btn_listrandom (1).png</file>
+        <file>image/music/btn_listrandom (2).png</file>
+        <file>image/music/btn_listscircle_single (1).png</file>
+        <file>image/music/btn_listscircle_single (2).png</file>
+        <file>image/music/btn_listsingle (1).png</file>
+        <file>image/music/btn_listsingle (2).png</file>
+        <file>image/music/btn_lrc (1).png</file>
+        <file>image/music/btn_lrc (2).png</file>
+        <file>image/music/btn_lrc (3).png</file>
+        <file>image/music/btn_lrc (4).png</file>
+        <file>image/music/btn_miniplaylist (1).png</file>
+        <file>image/music/btn_miniplaylist (2).png</file>
+        <file>image/music/btn_miniplaylist (3).png</file>
+        <file>image/music/btn_miniplaylist (4).png</file>
+        <file>image/music/btn_more (1).png</file>
+        <file>image/music/btn_more (2).png</file>
+        <file>image/music/btn_more (3).png</file>
+        <file>image/music/btn_more (4).png</file>
+        <file>image/music/btn_next (1).png</file>
+        <file>image/music/btn_next (2).png</file>
+        <file>image/music/btn_next (3).png</file>
+        <file>image/music/btn_next (4).png</file>
+        <file>image/music/btn_pause (1).png</file>
+        <file>image/music/btn_pause (2).png</file>
+        <file>image/music/btn_pause (3).png</file>
+        <file>image/music/btn_pause (4).png</file>
+        <file>image/music/btn_play (1).png</file>
+        <file>image/music/btn_play (2).png</file>
+        <file>image/music/btn_play (3).png</file>
+        <file>image/music/btn_play (4).png</file>
+        <file>image/music/btn_previous (1).png</file>
+        <file>image/music/btn_previous (2).png</file>
+        <file>image/music/btn_previous (3).png</file>
+        <file>image/music/btn_previous (4).png</file>
+        <file>image/music/menu_vol.png</file>
+        <file>image/music/music_example_pic.jpg</file>
+        <file>image/music/btn_addtips (1).png</file>
+        <file>image/music/btn_addtips (2).png</file>
+        <file>image/music/btn_addtips (3).png</file>
+        <file>image/music/btn_addtips (4).png</file>
+        <file>image/music/btn_cloud (1).png</file>
+        <file>image/music/btn_cloud (2).png</file>
+        <file>image/music/btn_cloud (3).png</file>
+        <file>image/music/btn_cross (1).png</file>
+        <file>image/music/btn_cross (2).png</file>
+        <file>image/music/btn_cross (3).png</file>
+        <file>image/music/btn_cross (4).png</file>
+        <file>image/music/btn_del (1).png</file>
+        <file>image/music/btn_del (2).png</file>
+        <file>image/music/btn_del (3).png</file>
+        <file>image/music/btn_del (4).png</file>
+        <file>image/music/btn_downloadmini (1).png</file>
+        <file>image/music/btn_downloadmini (2).png</file>
+        <file>image/music/btn_downloadmini (3).png</file>
+        <file>image/music/btn_downloadmini (4).png</file>
+        <file>image/music/btn_islove (1).png</file>
+        <file>image/music/btn_islove (2).png</file>
+        <file>image/music/btn_islove (3).png</file>
+        <file>image/music/btn_listhide (1).png</file>
+        <file>image/music/btn_listhide (2).png</file>
+        <file>image/music/btn_listhide (3).png</file>
+        <file>image/music/btn_listshow (1).png</file>
+        <file>image/music/btn_listshow (2).png</file>
+        <file>image/music/btn_listshow (3).png</file>
+        <file>image/music/btn_location (1).png</file>
+        <file>image/music/btn_location (2).png</file>
+        <file>image/music/btn_location (3).png</file>
+        <file>image/music/btn_love (1).png</file>
+        <file>image/music/btn_love (2).png</file>
+        <file>image/music/btn_love (3).png</file>
+        <file>image/music/btn_love (4).png</file>
+        <file>image/music/btn_mask.png</file>
+        <file>image/music/btn_music (1).png</file>
+        <file>image/music/btn_music (2).png</file>
+        <file>image/music/btn_music (3).png</file>
+        <file>image/music/btn_mv (1).png</file>
+        <file>image/music/btn_mv (2).png</file>
+        <file>image/music/btn_mv (3).png</file>
+        <file>image/music/btn_mv (4).png</file>
+        <file>image/music/btn_phone (1).png</file>
+        <file>image/music/btn_phone (2).png</file>
+        <file>image/music/btn_phone (3).png</file>
+        <file>image/music/btn_radio (1).png</file>
+        <file>image/music/btn_radio (2).png</file>
+        <file>image/music/btn_radio (3).png</file>
+        <file>image/music/btn_search (1).png</file>
+        <file>image/music/btn_search (2).png</file>
+        <file>image/music/btn_search (3).png</file>
+        <file>image/music/btn_searchadd (1).png</file>
+        <file>image/music/btn_searchadd (2).png</file>
+        <file>image/music/btn_searchadd (3).png</file>
+        <file>image/music/btn_searchadd (4).png</file>
+        <file>image/music/btn_searchplay (1).png</file>
+        <file>image/music/btn_searchplay (2).png</file>
+        <file>image/music/btn_searchplay (3).png</file>
+        <file>image/music/btn_searchplay (4).png</file>
+        <file>image/music/checked.png</file>
+        <file>image/music/indicator.png</file>
+        <file>image/music/indicator_down (1).png</file>
+        <file>image/music/indicator_down (2).png</file>
+        <file>image/music/indicator_menu (1).png</file>
+        <file>image/music/indicator_menu (2).png</file>
+        <file>image/music/indicator_menu (3).png</file>
+        <file>image/music/indicator_top (1).png</file>
+        <file>image/music/indicator_top (2).png</file>
+        <file>image/music/lab_add.png</file>
+        <file>image/music/lab_addfolder.png</file>
+        <file>image/music/lab_backups.png</file>
+        <file>image/music/lab_success.png</file>
+        <file>image/music/loading.png</file>
+        <file>image/music/net_connect (1).png</file>
+        <file>image/music/net_connect (2).png</file>
+        <file>image/music/net_connect (3).png</file>
+        <file>image/music/net_connect (4).png</file>
+        <file>image/music/unchecked.png</file>
+        <file>image/music/wire_connect (1).png</file>
+        <file>image/music/wire_connect (2).png</file>
+        <file>image/music/wire_connect (3).png</file>
+        <file>image/music/wire_connect (4).png</file>
+        <file>image/music/btn_cloud (1)_big.png</file>
+        <file>image/music/btn_cloud (2)_big.png</file>
+        <file>image/music/btn_cloud (3)_big.png</file>
+        <file>image/music/btn_music (1)_big.png</file>
+        <file>image/music/btn_music (2)_big.png</file>
+        <file>image/music/btn_music (3)_big.png</file>
+        <file>image/music/btn_radio (1)_big.png</file>
+        <file>image/music/btn_radio (2)_big.png</file>
+        <file>image/music/btn_radio (3)_big.png</file>
+        <file>image/music/menu_vol (2).png</file>
+    </qresource>
+</RCC>

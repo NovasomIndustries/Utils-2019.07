@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# Start the network....
+#
+
+. /etc/sysconfig/system_vars
+. /etc/sysconfig/network
+
+[ "${ETH0_ENABLED}" = "N" ] && exit 0
+
+MAC_FROM_CMDLINE="00:4f:9f:01:00:0e"
+for MACADDR in `cat /proc/cmdline` ; do
+        echo $MACADDR | grep mac_addr > /dev/null
+        [ "$?" == "0" ] && MAC_FROM_CMDLINE=`echo "${MACADDR}" | sed 's/mac_addr=//g'`
+done
+
+if [ -f /etc/sysconfig/mac_addr ];  then
+        . /etc/sysconfig/mac_addr
+fi
+
+case "$1" in
+  start)
+ 	echo "Starting network..."
+	if [ "$NET_USE_DHCP" == "Y" ]; then
+		ifconfig ${NET_DEVICE} hw ether ${MAC_FROM_CMDLINE} up
+		udhcpc -i ${NET_DEVICE} &
+	else
+		echo "search ${NET_SUFFIX}" > /etc/resolv.conf
+		echo "nameserver ${NET_DNS_LIST}" >> /etc/resolv.conf
+		ifconfig ${NET_DEVICE} ${NET_IP_ADDRESS} netmask ${NET_MASK} hw ether ${MAC_FROM_CMDLINE} up >/dev/null 2>&1
+		route add default gw ${NET_GATEWAY} dev ${NET_DEVICE} >/dev/null 2>&1
+		echo "${NET_IP_ADDRESS}" > /tmp/my_ip
+	fi
+	if [ -f /usr/sbin/telnetd ]; then
+		telnetd
+	fi
+	if [ -f /usr/sbin/inetd ]; then
+		inetd
+	fi
+	;;
+  stop)
+	echo -n "Stopping network..."
+	/sbin/ifdown -a
+	kill -9 `pidof telnetd`
+	;;
+  restart|reload)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+

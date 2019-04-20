@@ -1,0 +1,6 @@
+2017/1/5 10:17:38   plugin install begin.......
+2017/1/5 10:17:38   current os is 32 bit
+2017/1/5 10:17:38   toDirectory:C:/Windows/System32/ecologyplugin
+2017/1/5 10:17:38   basePath:F:\WorkSpace\Carmachine\image\setting\EcologyPlugin\EcologyPlugin
+2017/1/5 10:17:38   runBase:regsvr32 C:\Windows\System32
+2017/1/5 10:17:40   plugin install success......

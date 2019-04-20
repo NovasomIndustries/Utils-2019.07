@@ -1,0 +1,68 @@
+#!/bin/sh
+HERE=`pwd`
+cd /dev
+for i in 1 2 3 4 5 6 7 8 9 10; do
+        ln -s mmcblk2p${i} mmcblk0p${i}
+done
+cd ${HERE}
+mount /dev/mmcblk0p4 /mnt
+if [ -d /mnt/application_storage ]; then
+	cp -r /mnt/application_storage /tmp/.
+fi
+if [ -d /mnt/sysconfig/etc ]; then
+	if [ -f /etc/sysconfig/filesystem_name ]; then
+		if [ -f /mnt/sysconfig/etc/sysconfig/filesystem_name ]; then
+			. /mnt/sysconfig/etc/sysconfig/filesystem_name
+			STORED=${FILE_SYSTEM_NAME}
+			. /etc/sysconfig/filesystem_name
+			if [ ${STORED} == ${FILE_SYSTEM_NAME} ]; then
+				cp -a /mnt/sysconfig/etc /
+			else
+				echo "permanent storage updated" > /tmp/fs_status
+				rm -rf /mnt/sysconfig
+				mkdir /mnt/sysconfig
+				cp -a /etc /mnt/sysconfig/.
+				cp -a /root /mnt/sysconfig/.
+			fi
+		else
+			cp -a /etc /mnt/sysconfig/.
+			cp -a /root /mnt/sysconfig/.
+		fi
+	else
+		cp -a /etc /mnt/sysconfig/.
+		cp -a /root /mnt/sysconfig/.
+	fi
+else
+	mkdir /mnt/sysconfig
+	cp -a /etc /mnt/sysconfig/.
+fi
+
+if [ -d /mnt/sysconfig/root ]; then
+	cp -a /mnt/sysconfig/root /
+else
+	cp -a /root /mnt/sysconfig/.
+fi
+umount /mnt
+
+# Start all init scripts in /etc/init.d
+# executing them in numerical order.
+#
+for i in /etc/init.d/S??* ;do
+	# Ignore dangling symlinks (if any).
+	[ ! -f "$i" ] && continue
+
+	case "$i" in
+		*.sh)
+			# Source shell script for speed.
+			(
+				trap - INT QUIT TSTP
+				set start
+				. $i
+			)
+			;;
+		*)
+			# No sh extension, so fork subprocess.
+			$i start
+			;;
+	esac
+done

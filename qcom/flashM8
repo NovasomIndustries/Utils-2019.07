@@ -1,0 +1,88 @@
+#!/bin/sh
+. ../version
+DISK=$1
+BOOTLOADERS="/Devel/NOVAsdk${VERSION}/Utils/qcom/qcom_bootloaders"
+echo -n "Clearing partitions ..."
+sudo sgdisk -Z ${DISK} >/dev/null 2>&1
+echo "Done"
+echo -n "Creating partition 1:sbl1 ..."
+sudo sgdisk -a 1 -n 1:131072:132095  -c 1:sbl1    -t 1:DEA0BA2C-CBDD-4805-B4F9-F428251C3E98 ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/sbl1.mbn of=${DISK}1 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 2:rpm ..."
+sudo sgdisk -a 1 -n 2:132096:133119  -c 2:rpm     -t 2:098DF793-D712-413D-9D4E-89D711772228 ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/rpm.mbn  of=${DISK}2 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 3:tz ..."
+sudo sgdisk -a 1 -n 3:133120:135167  -c 3:tz      -t 3:A053AA7F-40B8-4B1C-BA08-2F68AC71A4F4 ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/tz.mbn   of=${DISK}3 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 4:hyp ..."
+sudo sgdisk -a 1 -n 4:135168:136191  -c 4:hyp     -t 4:E1A6A689-0C8D-4CC6-B4E8-55A4320FBD8A ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/hyp.mbn  of=${DISK}4 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 5:sec ..."
+sudo sgdisk -a 1 -n 5:262144:262175  -c 5:sec     -t 5:303E6AC3-AF15-4C54-9E9B-D9A8FBECF401 ${DISK} >/dev/null 2>&1
+sync
+#sudo dd if=${BOOTLOADERS}/emmc_appsboot.mbn  of=${DISK}6 >/dev/null 2>&1
+sudo dd if=${BOOTLOADERS}/emmc_appsboot.mbn  of=${DISK}5 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 6:aboot ..."
+sudo sgdisk -a 1 -n 6:262176:264223  -c 6:aboot   -t 6:400FFDCD-22E0-47E7-9A23-F16ED9382388 ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/u-boot.img  of=${DISK}6 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 7:boot ..."
+sudo sgdisk -a 1 -n 7:264224:329759  -c 7:boot    -t 7:20117F86-E985-4357-B9EE-374BC1D8487D ${DISK} >/dev/null 2>&1
+sync
+sudo dd if=${BOOTLOADERS}/u-boot.img  of=${DISK}7 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 8:devinfo ..."
+sudo sgdisk -a 1 -n 8:329760:331807  -c 8:devinfo -t 8:1B81E7E6-F50D-419B-A739-2AEEF8DA3335 ${DISK} >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 9:bootpart ..."
+sudo sgdisk -a 1 -n 9:331808:+32M -c 9:bootpart  ${DISK} >/dev/null 2>&1
+sync
+echo y | sudo mkfs.ext3 ${DISK}9 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 10:configpart ..."
+sudo sgdisk -a 1 -n 10::+64M -c 10:configpart  ${DISK} >/dev/null 2>&1
+sync
+echo y | sudo mkfs.ext3 ${DISK}10 >/dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partition 11:rootfs ..."
+sudo sgdisk -a 1 -n 11:: -c 11:rootfs  ${DISK} >/dev/null 2>&1
+sync
+echo y | sudo mkfs.ext3 ${DISK}11 >/dev/null 2>&1
+sync
+echo "Done"
+
+sudo rm -rf tmpmnt
+sudo mkdir tmpmnt
+FILES="/Devel/NOVAsom${VERSION}/Blobs/linux-qualcomm-4.11.0_Image /Devel/NOVAsdk${VERSION}/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/dts/qcom/apq8016-sbc.dtb /Devel/NOVAsdk${VERSION}/FileSystem/M8_Base/output/images/uInitrd"
+sudo mount ${DISK}9 tmpmnt
+sudo mkdir tmpmnt/NOVAboot
+for i in ${FILES}; do
+        sudo cp ${i} tmpmnt/NOVAboot/.
+        echo "File $i stored on ${DISK}9"
+done
+sudo mv tmpmnt/NOVAboot/linux-qualcomm-4.11.0_Image tmpmnt/NOVAboot/Image
+sudo umount tmpmnt
+sync
+
+echo "0" > /tmp/result
+

@@ -1,0 +1,21 @@
+#!/bin/bash
+# ${1} pointer to the application_storage folder
+# ${2} is the device
+DISK=${2}
+
+
+echo "1" > /tmp/result
+sync
+sudo rm -rf /tmp/tmpmount
+sudo mkdir /tmp/tmpmount
+sleep 1
+sudo mount ${DISK}10 /tmp/tmpmount
+[ "$?" != "0" ] && exit
+sudo rm -rf /tmp/tmpmount/application_storage
+sudo mkdir /tmp/tmpmount/application_storage
+echo -n "Copying application_storage ..."
+sudo cp ${1}/* /tmp/tmpmount/application_storage/.
+echo "Done"
+sudo umount /tmp/tmpmount
+sync
+echo "0" > /tmp/result

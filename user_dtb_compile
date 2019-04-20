@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# $1 = input file 
+# $2 = board, can be P or U
+echo "1" > /tmp/result
+[ "$1" = "" ] && echo "No input file given"
+[ "$1" = "" ] && exit
+INFILE=$1
+DTS_INFILE=${INFILE}.dts
+DTS_TMP=${INFILE}.tmp.dts
+DTB_OUTFILE=${INFILE}.dtb
+
+FOUND="0"
+if [ "$2" = "P" ]; then
+	DTC_EXEC="dtc"
+	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-imx_4.1.15_1.2.0_ga/scripts/dtc/dtc"
+	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
+	KERNEL="linux-imx_4.1.15_1.2.0_ga"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-imx_4.1.15_1.2.0_ga/arch/arm/boot/dts"
+	STD_FILES="imx6q.dtsi imx6dl.dtsi imx6dl-pinfunc.h imx6qdl.dtsi skeleton.dtsi imx6q-pinfunc.h"
+	FOUND="1"
+fi
+if [ "$2" = "U" ]; then
+	DTC_EXEC="dtc"
+	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-imx_4.1.43/scripts/dtc/dtc"
+	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
+	KERNEL="linux-imx_4.1.43"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-imx_4.1.43/arch/arm/boot/dts"
+	STD_FILES="imx6dl.dtsi imx6dl-pinfunc.h imx6qdl.dtsi skeleton.dtsi imx6ull.dtsi imx6ull-pinfunc.h imx6ul-pinfunc.h imx6ull-pinfunc-snvs.h "
+	FOUND="1"
+fi
+if [ "$2" = "M7" ]; then
+	DTC_EXEC="dtc"
+	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01/scripts/dtc/dtc"
+	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
+	KERNEL="linux-4.4.167_M7_2019.01"
+	#KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01/arch/arm64/boot/dts"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01"
+	STD_FILES="arch/arm64/boot/dts/rockchip/rk3328-dram-default-timing.dtsi ../../Utils/rock/rk3328.dtsi"
+	FOUND="1"
+fi
+[ ! "$FOUND" = "1" ] && echo "Not implemented yet"
+echo "0" > /tmp/result
+[ ! "$FOUND" = "1" ] && return 0
+
+echo ""
+echo "################################"
+echo "Starting copy"
+[ ! -d ${WORKAREA_LOCATION} ] && mkdir ${WORKAREA_LOCATION}
+[ ! -f ${WORKAREA_LOCATION}/${DTS_INFILE} ] && echo "File not found"
+[ ! -f ${WORKAREA_LOCATION}/${DTS_INFILE} ] && return 1
+for i in ${STD_FILES}; do
+	[ -f ${WORKAREA_LOCATION}/${i} ] && rm ${WORKAREA_LOCATION}/${i}
+	echo "Copying ${i}"
+	cp ${KERNEL_LOCATION}/${i} ${WORKAREA_LOCATION}/.
+done
+echo "Done"
+cd ${WORKAREA_LOCATION}
+echo "Starting compile"
+echo "cpp -nostdinc -I ${KERNEL_LOCATION}/include -undef -x assembler-with-cpp ${DTS_INFILE} > ${DTS_TMP}"
+cpp -nostdinc -I ${KERNEL_LOCATION}/include -undef -x assembler-with-cpp ${DTS_INFILE} > ${DTS_TMP}
+[ ! "$?" = "0" ] && exit
+echo "${DTC_EXEC} -O dtb -b 0 -o ${DTB_OUTFILE} ${DTS_TMP}"
+${DTC_EXEC} -O dtb -b 0 -o ${DTB_OUTFILE} ${DTS_TMP}
+[ ! "$?" = "0" ] && exit
+rm ${INFILE}.tmp.dts
+echo "Compilation successful"
+echo "################################"
+echo 0 > /tmp/result
