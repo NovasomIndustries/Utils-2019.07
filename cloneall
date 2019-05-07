@@ -1,6 +1,6 @@
 #!/bin/sh
 . ./version
-VERSION="2019.01"
+VERSION="2019.07"
 git clone https://github.com/NovasomIndustries/Utils-${VERSION}.git
 git clone https://github.com/NovasomIndustries/Xcompiler-${VERSION}.git
 HERE=`pwd`

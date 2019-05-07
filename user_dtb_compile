@@ -31,11 +31,10 @@ if [ "$2" = "U" ]; then
 fi
 if [ "$2" = "M7" ]; then
 	DTC_EXEC="dtc"
-	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01/scripts/dtc/dtc"
+	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7/scripts/dtc/dtc"
 	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
-	KERNEL="linux-4.4.167_M7_2019.01"
-	#KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01/arch/arm64/boot/dts"
-	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7_2019.01"
+	KERNEL="linux-4.4.167_M7"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7"
 	STD_FILES="arch/arm64/boot/dts/rockchip/rk3328-dram-default-timing.dtsi ../../Utils/rock/rk3328.dtsi"
 	FOUND="1"
 fi

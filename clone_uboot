@@ -14,7 +14,4 @@ echo "M8 done"
 [ ! -d u-boot-novasomM7-2017.09_${VERSION} ] && ln -s u-boot-novasomM7-2017.09_${VERSION} u-boot-novasomM7-2017.09
 [ ! -d u-boot-novasomM7-2017.09_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomM7-2017.09_${VERSION}.git
 echo "M7 done"
-[ ! -d u-boot-novasomN1-2018.03_${VERSION} ] && ln -s u-boot-novasomN1-2018.03_${VERSION} u-boot-novasomN1-2017.11
-[ ! -d u-boot-novasomN1-2018.03_${VERSION} ] && git clone https://github.com/NovasomIndustries/u-boot-novasomN1-2018.03_${VERSION}.git
-echo "N1 done"
 
