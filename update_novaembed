@@ -34,15 +34,20 @@ novaembed()
 }
 
 echo -n "Working on NOVAembed ... "
-cd /Devel/NOVAsdk/Qt/NOVAembed
-git pull --dry-run 2> ../res
-cat ../res | grep master
-if [ "$?" = "0" ]; then
-	cd ..
-	rm -rf *
-	novaembed
-	echo 1 > /tmp/result
+if [ -d /Devel/NOVAsdk/Qt/NOVAembed-2019.07 ]; then
+	cd /Devel/NOVAsdk/Qt/NOVAembed
+	git pull --dry-run 2> ../res
+	cat ../res | grep master
+	if [ "$?" = "0" ]; then
+		cd ..
+		rm -rf *
+		novaembed
+		echo 1 > /tmp/result
+	else
+		echo "Already up to date"
+		echo "0" > /tmp/result
+	fi
 else
-	echo "Already up to date"
-	echo "0" > /tmp/result
+	cd /Devel/NOVAsdk/Qt
+	novaembed
 fi
