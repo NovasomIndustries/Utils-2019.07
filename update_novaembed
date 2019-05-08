@@ -6,9 +6,10 @@ novaembed()
 	echo "Doing a full clone"
 	git clone https://github.com/NovasomIndustries/NOVAembed-${VERSION}.git
 	ln -s NOVAembed-${VERSION} NOVAembed
+	rm -rf /Devel/NOVAsdk/Qt/build-NOVAembed-Desktop-Debug
 	mkdir /Devel/NOVAsdk/Qt/build-NOVAembed-Desktop-Debug
 	cd /Devel/NOVAsdk/Qt/build-NOVAembed-Desktop-Debug
-	/usr/bin/qmake /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed.pro -r -spec linux-g++-64 CONFIG+=debug
+	/usr/lib/x86_64-linux-gnu/qt5/bin/qmake /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed.pro -spec linux-g++-64 CONFIG+=debug CONFIG+=qml_debug
 	make
 	cd /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed_P_Parser
 	rm -rf obj bin
