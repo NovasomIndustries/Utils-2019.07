@@ -34,7 +34,7 @@ novaembed()
 }
 
 echo -n "Working on NOVAembed ... "
-cd /Devel/NOVAsdk/Qt/NOVAembed-${VERSION}
+cd /Devel/NOVAsdk/Qt/NOVAembed
 git pull --dry-run 2> ../res
 cat ../res | grep master
 if [ "$?" = "0" ]; then
