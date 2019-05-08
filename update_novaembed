@@ -8,7 +8,7 @@ novaembed()
 	ln -s NOVAembed-${VERSION} NOVAembed
 	mkdir /Devel/NOVAsdk/Qt/build-NOVAembed-Desktop-Debug
 	cd /Devel/NOVAsdk/Qt/build-NOVAembed-Desktop-Debug
-	/usr/lib64/qt5/bin/qmake /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed.pro -r -spec linux-g++-64 CONFIG+=debug
+	/usr/bin/qmake /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed.pro -r -spec linux-g++-64 CONFIG+=debug
 	make
 	cd /Devel/NOVAsdk/Qt/NOVAembed/NOVAembed_P_Parser
 	rm -rf obj bin
