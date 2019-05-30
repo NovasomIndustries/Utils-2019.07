@@ -16,7 +16,7 @@ if ! [ -z "${3}" ]; then
 	sudo mount ${DISK}1 ext_tmp
 	sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${3} ext_tmp/.
 	if ! [ -z "${4}" ]; then
-		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${4} ext_tmp/.
+		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${4} ext_tmp/dtb.dtb
 	fi
 	sync
 	sudo umount ext_tmp
