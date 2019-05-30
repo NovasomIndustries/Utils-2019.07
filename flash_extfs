@@ -14,9 +14,11 @@ if ! [ -z "${3}" ]; then
 	rm -rf ext_tmp
 	mkdir ext_tmp
 	sudo mount ${DISK}1 ext_tmp
-	sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${3} ext_tmp/.
 	if ! [ -z "${4}" ]; then
-		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${4} ext_tmp/dtb.dtb
+		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${3} ext_tmp/.
+		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${4} ext_tmp/.
+	else
+		sudo cp /Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${3} ext_tmp/dtb.dtb
 	fi
 	sync
 	sudo umount ext_tmp
