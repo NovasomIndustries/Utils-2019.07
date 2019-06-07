@@ -31,6 +31,7 @@ if ! [ -f ../../Deploy/uInitrd ]; then
 	echo "1" > /tmp/result
 	exit 1
 fi
+sudo umount /dev/sdb*  > /dev/null 2>&1
 [ "${DISK}" = "" ] && DISK="/dev/sdb"
 echo -n "Zeroing ${DISK} ... "
 sudo dd if=/dev/zero of=${DISK} bs=32M count=1 > /dev/null 2>&1
