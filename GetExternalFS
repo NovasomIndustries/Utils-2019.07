@@ -1,0 +1,19 @@
+#!/bin/bash
+CURRENTBOARD=$1
+REPO_SERVER=$2
+BACKUP_REPO_SERVER=$3
+FSNAME=$4
+
+echo 1 > /tmp/result
+cd ../ExternalFileSystems/${CURRENTBOARD}
+echo "wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}"
+wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}
+if ! [ "$?"="0" ]; then
+	wget --tries=2 --timeout=10 http://${BACKUP_REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}
+	if ! [ "$?"="0" ]; then
+		exit 1
+	fi
+fi
+echo 0 > /tmp/result
+exit 0
+
