@@ -8,7 +8,6 @@ echo 1 > /tmp/result
 cd ../ExternalFileSystems/${CURRENTBOARD}
 # get lengths
 rm -f len
-echo "wget --spider --server-response http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME} -o len"
 wget --spider --server-response http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME} -o len
 if ! [ "$?"="0" ]; then
 	wget --spider --server-response http://${BACKUP_REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME} -o len
@@ -22,10 +21,7 @@ if [ -z ${LEN} ]; then
 	echo "File does'nt exist"
 	exit 1
 fi
-echo "Length is ${LEN}"
 LOCAL_SIZE=`du -b "${FSNAME}" | awk '{print $1}'`
-echo "Local size is ${LOCAL_SIZE}"
-#LOCAL_SIZE=${LEN}
 if ! [ "${LOCAL_SIZE}" = "${LEN}" ]; then
 	echo "File differs"
 	exit 1
