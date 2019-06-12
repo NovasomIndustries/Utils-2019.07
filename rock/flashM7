@@ -83,24 +83,23 @@ sudo partprobe ${DISK}
 sleep 1
 echo "Done"
 echo -n "Formatting and populating partition 4... "
-yes | sudo mkfs.ext4 ${DISK}4
+sudo mkfs.ext4 ${DISK}4
 echo "Done"
 if [ "${USERNUM}" = "1" ]; then
 	echo -n "Formatting and populating partition 5... "
-	yes | sudo mkfs.ext4 ${DISK}5
+	sudo mkfs.ext4 ${DISK}5
 	echo "Done"
 fi
 if [ "${USERNUM}" = "2" ]; then
 	echo -n "Formatting and populating partition 5... "
-	yes | sudo mkfs.ext4 ${DISK}5
+	sudo mkfs.ext4 ${DISK}5
 	echo "Done"
 	echo -n "Formatting and populating partition 6... "
-	yes | sudo mkfs.ext4 ${DISK}6
+	sudo mkfs.ext4 ${DISK}6
 	echo "Done"
 fi
 echo -n "Formatting and populating partition 8... "
-#yes | sudo mkfs.vfat ${DISK}8
-yes | sudo mkfs.ext2 ${DISK}8
+sudo mkfs.ext2 ${DISK}8
 echo "Done"
 sync
 echo -n "Storing "
