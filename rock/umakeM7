@@ -17,12 +17,12 @@ make mrproper
 cp ${HERE}/rkbin/rk322xh_miniloader_v2.46.bin .
 cp ${HERE}/rkbin/rk3328_ddr_333MHz_v1.13.bin .
 cp ${HERE}/rkbin/rk3328_ddr_786MHz_v1.13.bin .
-./do_idbloader.sh
-[ "$?" != "0" ] && exit
+#./do_idbloader.sh
+#[ "$?" != "0" ] && exit
 mv gitb.git .git
 HERE=`pwd` 
 cd ../../Deploy
-ln -s ${BOOT_M7_FROM_DEPLOY}/idbloader.img m7-idbloader.img
+#ln -s ${BOOT_M7_FROM_DEPLOY}/idbloader.img m7-idbloader.img
 ln -s ${BOOT_M7_FROM_DEPLOY}/uboot.img m7-uboot.img
 ln -s ${BOOT_M7_FROM_DEPLOY}/trust.img m7-trust.img
 echo "0" > /tmp/result

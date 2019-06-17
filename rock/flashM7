@@ -16,7 +16,9 @@ KERNEL="arch/arm64/boot/Image"
 BOOTDIR="../../Bootloader/u-boot-novasomM7-2017.09"
 KERNELDIR="../../Kernel/linux-4.4.167_M7"
 DEPLOYDIR="../../Deploy"
-FILES="${KERNELDIR}/${KERNEL} ${BOOTDIR}/idbloader.img ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+TOOLSDIR="../../Utils/rock/rkbin"
+
+FILES="${KERNELDIR}/${KERNEL} ${TOOLSDIR=}/SD.bin ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
 for i in ${FILES}; do
 	if ! [ -f ${i} ]; then
 		NOTFOUND=`basename ${i}`
@@ -102,15 +104,19 @@ echo -n "Formatting and populating partition 8... "
 sudo mkfs.ext2 ${DISK}8
 echo "Done"
 sync
-echo -n "Storing "
-echo -n "idbloader.img "
-sudo dd if=${BOOTDIR}/idbloader.img of=/dev/sdb seek=64 conv=notrunc > /dev/null 2>&1
-echo -n "uboot.img "
-sudo dd if=${BOOTDIR}/uboot.img of=/dev/sdb seek=16384 conv=notrunc > /dev/null 2>&1
-echo -n "trust.img "
-sudo dd if=${BOOTDIR}/trust.img of=/dev/sdb seek=24576 conv=notrunc > /dev/null 2>&1
+echo "Storing SD.bin"
+sudo dd if=${TOOLSDIR}/SD.bin of=${DISK} seek=$(((0x000040 + 0x0000))) conv=sync,fsync
+sudo dd if=${TOOLSDIR}/SD.bin of=${DISK} seek=$(((0x000040 + 0x0400))) conv=sync,fsync
+sudo dd if=${TOOLSDIR}/SD.bin of=${DISK} seek=$(((0x000040 + 0x0800))) conv=sync,fsync
+sudo dd if=${TOOLSDIR}/SD.bin of=${DISK} seek=$(((0x000040 + 0x0C00))) conv=sync,fsync
+sudo dd if=${TOOLSDIR}/SD.bin of=${DISK} seek=$(((0x000040 + 0x1000))) conv=sync,fsync
+
+echo "Storing uboot.img"
+sudo dd if=${BOOTDIR}/uboot.img  of=${DISK} seek=$(((0x002000 + 0x2000))) ibs=1M conv=sync,fsync
+echo "Storing trust.img "
+sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=$(((0x004000 + 0x2000))) ibs=1M conv=sync,fsync
 sync
-echo "Done"
+
 rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}8 mdisk
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
