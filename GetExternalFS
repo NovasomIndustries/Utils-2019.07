@@ -6,6 +6,7 @@ FSNAME=$4
 
 echo 1 > /tmp/result
 cd ../ExternalFileSystems/${CURRENTBOARD}
+rm -f ${FSNAME}*
 echo "wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}"
 wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}
 if ! [ "$?"="0" ]; then

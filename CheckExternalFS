@@ -13,21 +13,25 @@ if ! [ "$?"="0" ]; then
 	wget --spider --server-response http://${BACKUP_REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME} -o len
 	if ! [ "$?"="0" ]; then
 		echo "Broken link"
+		rm -f len
 		exit 1
 	fi
 fi
 LEN=`cat len | grep Length | grep applicat | awk '{print $2}'`
 if [ -z ${LEN} ]; then
 	echo "File does'nt exist"
+	rm -f len
 	exit 1
 fi
 LOCAL_SIZE=`du -b "${FSNAME}" | awk '{print $1}'`
 if ! [ "${LOCAL_SIZE}" = "${LEN}" ]; then
 	echo "File differs"
+	rm -f len
 	exit 1
 else
 	echo "File are the same"
 fi
+rm -f len
 echo 0 > /tmp/result
 exit 0
 
