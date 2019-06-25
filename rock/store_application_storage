@@ -13,7 +13,7 @@ sudo mount ${DISK}4 /tmp/tmpmount
 sudo rm -rf /tmp/tmpmount/application_storage
 sudo mkdir /tmp/tmpmount/application_storage
 echo -n "Copying application_storage ..."
-sudo cp ${1}/* /tmp/tmpmount/application_storage/.
+sudo cp -r ${1}/* /tmp/tmpmount/application_storage/.
 echo "Done"
 sudo umount /tmp/tmpmount
 sync
