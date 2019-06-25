@@ -1,5 +1,5 @@
 [Tools Version]
-Tools=2019.7.001
-rcTools=rc9
+Tools=2019.7.002
+rcTools=rc1
 [Package to Install]
 Package=none
