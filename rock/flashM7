@@ -117,6 +117,16 @@ echo "Storing trust.img "
 sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=$(((0x004000 + 0x2000))) ibs=1M conv=sync,fsync
 sync
 
+#echo -n "Storing "
+#echo -n "idbloader.img "
+#sudo dd if=${BOOTDIR}/idbloader.img of=/dev/sdb seek=64 conv=notrunc > /dev/null 2>&1
+#echo -n "uboot.img "
+#sudo dd if=${BOOTDIR}/uboot.img of=/dev/sdb seek=16384 conv=notrunc > /dev/null 2>&1
+#echo -n "trust.img "
+#sudo dd if=${BOOTDIR}/trust.img of=/dev/sdb seek=24576 conv=notrunc > /dev/null 2>&1
+#sync
+
+
 rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}8 mdisk
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image

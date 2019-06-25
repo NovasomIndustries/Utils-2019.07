@@ -5,42 +5,41 @@
 echo "1" > /tmp/result
 [ "$1" = "" ] && echo "No input file given"
 [ "$1" = "" ] && exit
+[ "$3" = "" ] && echo "No kernel specified"
+[ "$3" = "" ] && exit
 INFILE=$1
 DTS_INFILE=${INFILE}.dts
 DTS_TMP=${INFILE}.tmp.dts
 DTB_OUTFILE=${INFILE}.dtb
+echo "Working with $3"
 
+KERNEL=$3
 FOUND="0"
 if [ "$2" = "P" ]; then
-	DTC_EXEC="dtc"
-	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-imx_4.1.15_1.2.0_ga/scripts/dtc/dtc"
-	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
-	KERNEL="linux-imx_4.1.15_1.2.0_ga"
-	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-imx_4.1.15_1.2.0_ga/arch/arm/boot/dts"
+	#KERNEL="linux-imx_4.1.15_1.2.0_ga"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/${KERNEL}/arch/arm/boot/dts"
 	STD_FILES="imx6q.dtsi imx6dl.dtsi imx6dl-pinfunc.h imx6qdl.dtsi skeleton.dtsi imx6q-pinfunc.h"
 	FOUND="1"
 fi
 if [ "$2" = "U" ]; then
-	DTC_EXEC="dtc"
-	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-imx_4.1.43/scripts/dtc/dtc"
-	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
-	KERNEL="linux-imx_4.1.43"
-	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-imx_4.1.43/arch/arm/boot/dts"
+	#KERNEL="linux-imx_4.1.43"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/${KERNEL}/arch/arm/boot/dts"
 	STD_FILES="imx6dl.dtsi imx6dl-pinfunc.h imx6qdl.dtsi skeleton.dtsi imx6ull.dtsi imx6ull-pinfunc.h imx6ul-pinfunc.h imx6ull-pinfunc-snvs.h "
 	FOUND="1"
 fi
 if [ "$2" = "M7" ]; then
-	DTC_EXEC="dtc"
-	DTC_EXEC="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7/scripts/dtc/dtc"
-	WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
-	KERNEL="linux-4.4.167_M7"
-	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/linux-4.4.167_M7"
+	#KERNEL="linux-4.4.167_M7"
+	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/${KERNEL}"
 	STD_FILES="arch/arm64/boot/dts/rockchip/rk3328-dram-default-timing.dtsi ../../Utils/rock/rk3328.dtsi"
 	FOUND="1"
 fi
 [ ! "$FOUND" = "1" ] && echo "Not implemented yet"
 echo "0" > /tmp/result
 [ ! "$FOUND" = "1" ] && return 0
+
+DTC_EXEC="dtc"
+DTC_EXEC="/Devel/NOVAsdk/Kernel/${KERNEL}/scripts/dtc/dtc"
+WORKAREA_LOCATION="/Devel/NOVAsdk/DtbUserWorkArea"
 
 echo ""
 echo "################################"
