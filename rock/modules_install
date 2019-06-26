@@ -13,6 +13,7 @@ echo "1" > /tmp/result
 . ../${SOURCEMEFILE}
 cd ${KERNEL}
 echo "make modules_install INSTALL_MOD_PATH=${FILESYSTEM}/output/target ARCH=arm64"
+rm -rf ${FILESYSTEM}/output/target/lib/modules/*
 make modules_install INSTALL_MOD_PATH=${FILESYSTEM}/output/target ARCH=arm64
 [ ! "$?" = "0" ] && exit
 echo "0" > /tmp/result
