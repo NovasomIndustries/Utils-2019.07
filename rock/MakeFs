@@ -31,10 +31,14 @@ if [ "${FS_COMPILED}" = "1" ]; then
 	if [ -f ${KERNEL_PATH}/arch/arm64/boot/Image ]; then
 		cd ${HERE}
 		./modules_install ${KERNEL_PATH}  ${FILESYSTEM_PATH} SourceMe64
+		[ "$?" != "0" ] && echo "Modules Error" 
+		[ "$?" != "0" ] && echo "1" > /tmp/result
 		[ "$?" != "0" ] && exit
-		cd ${PREPEND_PATH}/${FSNAME}
 	fi
+	cd ${PREPEND_PATH}/${FSNAME}
 	make
+	[ "$?" != "0" ] && echo "Error"
+	[ "$?" != "0" ] && echo "1" > /tmp/result
 	[ "$?" != "0" ] && exit
 else
 	# here a double make is needed, the first to create the directories and the second after the modules installation
@@ -43,9 +47,12 @@ else
 	if [ -f ${KERNEL_PATH}/arch/arm64/boot/Image ]; then
 		cd ${HERE}
 	       ./modules_install ${KERNEL_PATH}  ${FILESYSTEM_PATH} SourceMe64
+		[ "$?" != "0" ] && echo "1" > /tmp/result
 		[ "$?" != "0" ] && exit
 		cd ${PREPEND_PATH}/${FSNAME}
 		make
+		[ "$?" != "0" ] && echo "Error"
+		[ "$?" != "0" ] && echo "1" > /tmp/result
 		[ "$?" != "0" ] && exit
 	fi
 fi
