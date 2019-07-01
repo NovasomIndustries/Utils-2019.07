@@ -36,15 +36,15 @@ fi
 sleep 5
 sudo umount /dev/sdb*  > /dev/null 2>&1
 [ "${DISK}" = "" ] && DISK="/dev/sdb"
+echo -n "Creating basic structure on ${DISK} ... "
+sudo sgdisk -Z ${DISK} > /dev/null 2>&1
+sudo partprobe ${DISK} > /dev/null 2>&1
+sync
+echo "Done"
 echo -n "Zeroing ${DISK} ... "
 sudo dd if=/dev/zero of=${DISK} bs=32M count=1 > /dev/null 2>&1
 sync
 echo "Done"
-echo -n "Creating basic structure on ${DISK} ... "
-sudo sgdisk -Z ${DISK} > /dev/null 2>&1
-sudo partprobe ${DISK} > /dev/null 2>&1
-echo "Done"
-sync
 echo -n "Creating partitions ... "
 sudo sgdisk -n 1::+7M  -c 1:loader1 ${DISK}
 sudo sgdisk -n 2::+4M  -c 2:loader2 ${DISK}
