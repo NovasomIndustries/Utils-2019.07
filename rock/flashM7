@@ -18,7 +18,7 @@ KERNELDIR="../../Kernel/linux-4.4.167_M7"
 DEPLOYDIR="../../Deploy"
 TOOLSDIR="../../Utils/rock/rkbin"
 
-FILES="${KERNELDIR}/${KERNEL} ${TOOLSDIR=}/SD.bin ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+FILES="${KERNELDIR}/${KERNEL} ${TOOLSDIR=}/SD.bin ${BOOTDIR}/idbloader.img  ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
 for i in ${FILES}; do
 	if ! [ -f ${i} ]; then
 		NOTFOUND=`basename ${i}`
@@ -120,13 +120,12 @@ sync
 
 #echo -n "Storing "
 #echo -n "idbloader.img "
-#sudo dd if=${BOOTDIR}/idbloader.img of=/dev/sdb seek=64 conv=notrunc > /dev/null 2>&1
+#sudo dd if=${BOOTDIR}/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
 #echo -n "uboot.img "
-#sudo dd if=${BOOTDIR}/uboot.img of=/dev/sdb seek=16384 conv=notrunc > /dev/null 2>&1
+#sudo dd if=${BOOTDIR}/uboot.img of=${DISK}  seek=16384 conv=notrunc > /dev/null 2>&1
 #echo -n "trust.img "
-#sudo dd if=${BOOTDIR}/trust.img of=/dev/sdb seek=24576 conv=notrunc > /dev/null 2>&1
+#sudo dd if=${BOOTDIR}/trust.img of=${DISK}  seek=24576 conv=notrunc > /dev/null 2>&1
 #sync
-
 
 rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}8 mdisk
