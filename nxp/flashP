@@ -18,7 +18,7 @@ sync
 
 SPL_FILE="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomP-2015.04/SPL"
 UBOOT_IMG="/Devel/NOVAsdk${VERSION}/Bootloader/u-boot-novasomP-2015.04/u-boot.img"
-KERNEL="/Devel/NOVAsdk${VERSION}/Blobs/linux-nxp_p-4.1.15.2_zImage"
+KERNEL="/Devel/NOVAsdk${VERSION}/Kernel/linux-imx_4.1.15_1.2.0/arch/arm/boot/zImage"
 DTB_FILESDL="/Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${5}"
 DTB_FILEQ="/Devel/NOVAsdk${VERSION}/DtbUserWorkArea/${6}"
 UINITRD="/Devel/NOVAsdk${VERSION}/Deploy/uInitrd"
