@@ -1,0 +1,35 @@
+#!/bin/sh
+[ ! -f /usr/bin/mysql ] && exit 0
+
+case "$1" in
+	start)
+		if test -f /usr/bin/mysqld_safe ; then
+			cd /usr
+			mysql_install_db --user=mysql --ldata=/tmp/mysql
+			sleep 1
+			echo -n "Starting mysql..."
+			/usr/bin/mysqld_safe --pid-file=/tmp/mysqld.pid  --datadir=/tmp/mysql &
+			usleep 900000
+mysql << _EOF_
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'novasis';
+quit
+_EOF_
+
+		fi
+		echo "done."
+		;;
+	stop)
+		echo -n "Stopping mysql..."
+		if test -f /tmp/mysqld.pid ; then
+			kill `cat /tmp/mysqld.pid`
+		fi
+		echo "done."
+		;;
+	restart)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: /etc/init.d/mysqld {start|stop|restart}"
+		;;
+esac

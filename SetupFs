@@ -92,7 +92,7 @@ cp /Devel/NOVAsdk/Utils/Configurations/${BUSYBOX_CFG_BASE} BusyBox.config
 # This is for M7 only END
 
 # Patches, standard files
-FILESTOPATCH="rtl8723bs_bt"
+FILESTOPATCH="apache ffmpeg  icu  mariadb  qt-webkit-kiosk  rtl8723bs_bt nodejs"
 for i in ${FILESTOPATCH}; do
 	rm -rf package/${i}
 	cp -r /Devel/NOVAsdk/Utils/Patches/${i} package/.
