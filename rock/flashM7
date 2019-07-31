@@ -85,28 +85,28 @@ sudo partprobe ${DISK}
 sleep 1
 echo "Done"
 echo -n "Formatting and populating partition 4... "
-sudo mkfs.ext4 ${DISK}4
+yes | sudo mkfs.ext4 ${DISK}4
 echo "Done"
 if [ "${USERNUM}" = "1" ]; then
 	echo -n "Formatting and populating partition 5... "
-	sudo mkfs.ext4 ${DISK}5
+	yes | sudo mkfs.ext4 ${DISK}5
 	echo "Done"
 fi
 if [ "${USERNUM}" = "2" ]; then
 	echo -n "Formatting and populating partition 5... "
-	sudo mkfs.ext4 ${DISK}5
+	yes | sudo mkfs.ext4 ${DISK}5
 	echo "Done"
 	echo -n "Formatting and populating partition 6... "
-	sudo mkfs.ext4 ${DISK}6
+	yes | sudo mkfs.ext4 ${DISK}6
 	echo "Done"
 fi
 echo -n "Formatting and populating partition 8... "
-sudo mkfs.ext2 ${DISK}8
+yes | sudo mkfs.ext2 ${DISK}8
 echo $?
 echo "Done"
 sync
 echo "Storing idbloader.img "
-sudo dd if=${BOOTDIR}/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
+sudo dd if=idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
 echo "Storing uboot.img"
 sudo dd if=${BOOTDIR}/uboot.img  of=${DISK} seek=$(((0x002000 + 0x2000))) ibs=1M conv=sync,fsync
 echo "Storing trust.img "

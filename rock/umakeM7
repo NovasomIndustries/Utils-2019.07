@@ -14,10 +14,6 @@ make mrproper
 [ "$?" != "0" ] && exit
 ./make.sh evb-rk3328
 [ "$?" != "0" ] && exit
-cp ${HERE}/rkbin/rk322xh_miniloader_v2.46.bin .
-cp ${HERE}/rkbin/rk3328_ddr_333MHz_v1.13.bin .
-cp ${HERE}/rkbin/rk3328_ddr_786MHz_v1.13.bin .
-./do_idbloader.sh
 #[ "$?" != "0" ] && exit
 mv gitb.git .git
 HERE=`pwd` 
