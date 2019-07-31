@@ -18,7 +18,7 @@ KERNELDIR="../../Kernel/linux-4.4.167_M7"
 DEPLOYDIR="../../Deploy"
 TOOLSDIR="../../Utils/rock/rkbin"
 
-FILES="${KERNELDIR}/${KERNEL} ${TOOLSDIR=}/SD.bin ${BOOTDIR}/idbloader.bin  ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+FILES="${KERNELDIR}/${KERNEL} idbloader.img  ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
 for i in ${FILES}; do
 	if ! [ -f ${i} ]; then
 		NOTFOUND=`basename ${i}`
@@ -105,8 +105,8 @@ sudo mkfs.ext2 ${DISK}8
 echo $?
 echo "Done"
 sync
-echo "Storing idbloader.bin "
-sudo dd if=${BOOTDIR}/idbloader.bin of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
+echo "Storing idbloader.img "
+sudo dd if=${BOOTDIR}/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
 echo "Storing uboot.img"
 sudo dd if=${BOOTDIR}/uboot.img  of=${DISK} seek=$(((0x002000 + 0x2000))) ibs=1M conv=sync,fsync
 echo "Storing trust.img "
