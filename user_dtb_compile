@@ -30,7 +30,7 @@ fi
 if [ "$2" = "M7" ]; then
 	#KERNEL="linux-4.4.167_M7"
 	KERNEL_LOCATION="/Devel/NOVAsdk/Kernel/${KERNEL}"
-	STD_FILES="arch/arm64/boot/dts/rockchip/rk3328-dram-default-timing.dtsi ../../Utils/rock/rk3328.dtsi"
+	STD_FILES="arch/arm64/boot/dts/rockchip/rk3328-dram-default-timing.dtsi arch/arm64/boot/dts/rockchip/rk3328.dtsi"
 	FOUND="1"
 fi
 [ ! "$FOUND" = "1" ] && echo "Not implemented yet"
