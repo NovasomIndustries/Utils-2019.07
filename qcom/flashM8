@@ -72,15 +72,13 @@ sync
 echo "Done"
 
 sudo rm -rf tmpmnt
-sudo mkdir tmpmnt
-FILES="/Devel/NOVAsom${VERSION}/Blobs/linux-qualcomm-4.11.0_Image /Devel/NOVAsdk${VERSION}/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/dts/qcom/apq8016-sbc.dtb /Devel/NOVAsdk${VERSION}/FileSystem/M8_Base/output/images/uInitrd"
+sudo mkdir -p tmpmnt/NOVAboot
+FILES="/Devel/NOVAsdk/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/Image /Devel/NOVAsdk/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/dts/qcom/apq8016-sbc.dtb /Devel/NOVAsdk/Deploy/uInitrd"
 sudo mount ${DISK}9 tmpmnt
-sudo mkdir tmpmnt/NOVAboot
 for i in ${FILES}; do
         sudo cp ${i} tmpmnt/NOVAboot/.
         echo "File $i stored on ${DISK}9"
 done
-sudo mv tmpmnt/NOVAboot/linux-qualcomm-4.11.0_Image tmpmnt/NOVAboot/Image
 sudo umount tmpmnt
 sync
 

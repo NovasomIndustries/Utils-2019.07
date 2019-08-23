@@ -14,7 +14,7 @@ make dragonboard410c_defconfig
 make -j32
 [ "$?" != "0" ] && exit
 ./dtbTool -o dt.img arch/arm/dts
-rm /Devel/NOVAsdk${VERSION}/Utils-1.0.5/qcom/qcom_bootloaders/u-boot.img
-./mkbootimg --kernel=u-boot-dtb.bin --output=/Devel/NOVAsdk${VERSION}/Utils-1.0.5/qcom/qcom_bootloaders/u-boot.img --dt=dt.img --pagesize 2048 --base 0x80000000 --ramdisk=rd --cmdline=""
+rm /Devel/NOVAsdk${VERSION}/Utils/qcom/qcom_bootloaders/u-boot.img
+./mkbootimg --kernel=u-boot-dtb.bin --output=/Devel/NOVAsdk${VERSION}/Utils/qcom/qcom_bootloaders/u-boot.img --dt=dt.img --pagesize 2048 --base 0x80000000 --ramdisk=rd --cmdline=""
 
 echo "0" > /tmp/result
