@@ -79,7 +79,7 @@ for i in ${FILES}; do
         sudo cp ${i} tmpmnt/NOVAboot/.
         echo "File $i stored on ${DISK}9"
 done
-sudo umount tmpmnt
+sudo umount ${DISK}*
 sync
 
 echo "0" > /tmp/result
