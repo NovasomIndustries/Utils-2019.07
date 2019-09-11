@@ -1,86 +1,107 @@
 #!/bin/sh
-DISK=$1
+
+#  1          131072          132095   512.0 KiB   FFFF  sbl1
+#  2          132096          133119   512.0 KiB   FFFF  rpm
+#  3          133120          135167   1024.0 KiB  FFFF  tz
+#  4          135168          136191   512.0 KiB   FFFF  hyp
+#  5          262144          262175   16.0 KiB    FFFF  sec
+#  6          262176          264223   1024.0 KiB  FFFF  aboot
+#  7          264224          329759   32.0 MiB    FFFF  boot
+#  8          329760          331807   1024.0 KiB  FFFF  devinfo
+#  9          331808          462879   64.0 MiB    8300  bootpart
+# 10          462880          593951   64.0 MiB    8300  configpart
+# 11          593952         7802846   3.4 GiB     8300  rootfs
+
+if [ -z "$1" ]; then
+	echo "$0 <device> in the form of /dev/sdX"
+	exit
+fi
+DISK=${1}
 BOOTLOADERS="/Devel/NOVAsdk/Utils/qcom/qcom_bootloaders"
+sudo umount ${DISK}*
+
 echo -n "Clearing partitions ..."
 sudo sgdisk -Z ${DISK} >/dev/null 2>&1
+sudo partprobe ${DISK}
+sync
 echo "Done"
 echo -n "Creating partition 1:sbl1 ..."
 sudo sgdisk -a 1 -n 1:131072:132095  -c 1:sbl1    -t 1:DEA0BA2C-CBDD-4805-B4F9-F428251C3E98 ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/sbl1.mbn of=${DISK}1 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 2:rpm ..."
 sudo sgdisk -a 1 -n 2:132096:133119  -c 2:rpm     -t 2:098DF793-D712-413D-9D4E-89D711772228 ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/rpm.mbn  of=${DISK}2 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 3:tz ..."
 sudo sgdisk -a 1 -n 3:133120:135167  -c 3:tz      -t 3:A053AA7F-40B8-4B1C-BA08-2F68AC71A4F4 ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/tz.mbn   of=${DISK}3 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 4:hyp ..."
 sudo sgdisk -a 1 -n 4:135168:136191  -c 4:hyp     -t 4:E1A6A689-0C8D-4CC6-B4E8-55A4320FBD8A ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/hyp.mbn  of=${DISK}4 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 5:sec ..."
 sudo sgdisk -a 1 -n 5:262144:262175  -c 5:sec     -t 5:303E6AC3-AF15-4C54-9E9B-D9A8FBECF401 ${DISK} >/dev/null 2>&1
-sync
-#sudo dd if=${BOOTLOADERS}/emmc_appsboot.mbn  of=${DISK}6 >/dev/null 2>&1
-sudo dd if=${BOOTLOADERS}/emmc_appsboot.mbn  of=${DISK}5 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 6:aboot ..."
 sudo sgdisk -a 1 -n 6:262176:264223  -c 6:aboot   -t 6:400FFDCD-22E0-47E7-9A23-F16ED9382388 ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/u-boot.img  of=${DISK}6 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 7:boot ..."
 sudo sgdisk -a 1 -n 7:264224:329759  -c 7:boot    -t 7:20117F86-E985-4357-B9EE-374BC1D8487D ${DISK} >/dev/null 2>&1
-sync
-sudo dd if=${BOOTLOADERS}/u-boot.img  of=${DISK}7 >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 8:devinfo ..."
 sudo sgdisk -a 1 -n 8:329760:331807  -c 8:devinfo -t 8:1B81E7E6-F50D-419B-A739-2AEEF8DA3335 ${DISK} >/dev/null 2>&1
-sync
 echo "Done"
 echo -n "Creating partition 9:bootpart ..."
-sudo sgdisk -a 1 -n 9:331808:+32M -c 9:bootpart  ${DISK} >/dev/null 2>&1
-sync
-echo y | sudo mkfs.ext3 ${DISK}9 >/dev/null 2>&1
-sync
+sudo sgdisk -a 1 -n 9:331808:462879 -c 9:bootpart -t:8300 ${DISK} >/dev/null 2>&1
 echo "Done"
 echo -n "Creating partition 10:configpart ..."
-sudo sgdisk -a 1 -n 10::+64M -c 10:configpart  ${DISK} >/dev/null 2>&1
-sync
-echo y | sudo mkfs.ext3 ${DISK}10 >/dev/null 2>&1
-sync
+sudo sgdisk -a 1 -n 10:462880:593951 -c 10:configpart -t:8300  ${DISK} >/dev/null 2>&1
 echo "Done"
-echo -n "Creating partition 11:rootfs ..."
-sudo sgdisk -a 1 -n 11:: -c 11:rootfs  ${DISK} >/dev/null 2>&1
 sync
-echo y | sudo mkfs.ext3 ${DISK}11 >/dev/null 2>&1
+
+sudo partprobe ${DISK} >/dev/null 2>&1
+sleep 1
+echo -n "Storing partition contents : "
+echo -n "sbl1 "
+sudo dd if=${BOOTLOADERS}/sbl1 of=${DISK}1 >/dev/null 2>&1
+echo -n "rpm "
+sudo dd if=${BOOTLOADERS}/rpm  of=${DISK}2 >/dev/null 2>&1
+echo -n "tz "
+sudo dd if=${BOOTLOADERS}/tz   of=${DISK}3 >/dev/null 2>&1
+echo -n "hyp "
+sudo dd if=${BOOTLOADERS}/hyp  of=${DISK}4 >/dev/null 2>&1
+echo -n "sec "
+sudo dd if=${BOOTLOADERS}/sec  of=${DISK}5 >/dev/null 2>&1
+echo -n "aboot "
+sudo dd if=${BOOTLOADERS}/aboot  of=${DISK}6 >/dev/null 2>&1
+echo -n "boot "
+sudo dd if=${BOOTLOADERS}/boot of=${DISK}7 >/dev/null 2>&1
+echo -n "devinfo "
+sudo dd if=${BOOTLOADERS}/devinfo of=${DISK}8 >/dev/null 2>&1
+sync
+sudo partprobe ${DISK} >/dev/null 2>&1
+echo "Done"
+sleep 1
+sync
+
+echo -n "Making file systems... "
+echo y | sudo mkfs.ext2 ${DISK}9 >/dev/null 2>&1
+echo y | sudo mkfs.ext2 ${DISK}10 >/dev/null 2>&1
 sync
 echo "Done"
 
-sudo rm -rf tmpmnt
-sudo mkdir -p tmpmnt
+DISKLOCATION="/tmp/tmpdisk"
+sudo rm -rf ${DISKLOCATION}
+sudo mkdir ${DISKLOCATION}
+sudo mount -t ext2 ${DISK}9 ${DISKLOCATION}
+sudo mkdir ${DISKLOCATION}/NOVAboot
 FILES="/Devel/NOVAsdk/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/Image /Devel/NOVAsdk/Kernel/linux-4.11.0-QualcommLinaro/arch/arm64/boot/dts/qcom/apq8016-sbc.dtb /Devel/NOVAsdk/Deploy/uInitrd"
-sudo mount ${DISK}9 tmpmnt
-sudo mkdir tmpmnt/NOVAboot
+echo -n "Storing kernel, dtb and file system... "
 for i in ${FILES}; do
-        sudo cp ${i} tmpmnt/NOVAboot/.
+        sudo cp ${i} ${DISKLOCATION}/NOVAboot/.
         echo "File $i stored on ${DISK}9"
 done
-sudo umount ${DISK}*
+sudo umount ${DISKLOCATION}
 sync
+echo "Done"
 
 echo "0" > /tmp/result
 
