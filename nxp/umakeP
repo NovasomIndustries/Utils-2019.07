@@ -12,8 +12,6 @@ make novasomp_defconfig
 [ "$?" != "0" ] && exit
 make -j32
 [ "$?" != "0" ] && exit
-cp u-boot.img ../../Blobs/p-uboot.img
-cp SPL ../../Blobs/p-SPL
 cd /Devel/NOVAsdk${VERSION}/Deploy
 rm -f u-boot.img SPL
 ln -s ${BOOT_P}/u-boot.img

@@ -1,24 +1,31 @@
 #!/bin/sh
 . ../SourceMe64
 echo "1" > /tmp/result
-HERE=`pwd`
+#HERE=`pwd`
 rm -f ../../Deploy/m7-idbloader.img ../../Deploy/m7-uboot.img ../../Deploy/m7-trust.img
-BOOT_M7_FROM_DEPLOY="../Bootloader/u-boot-novasomM7-2017.09"
-BOOT_M7="../${BOOT_M7_FROM_DEPLOY}"
+BOOT_M7="../../Bootloader/u-boot-novasomM7-2017.09"
 echo "1" > /tmp/result
+mv ${BOOT_M7}/make.sh ${BOOT_M7}/make.shOLD
+cp uboot_rockchip_make.sh ${BOOT_M7}/make.sh
 cd ${BOOT_M7}
+HERE=`pwd`
+cd ..
+ln -s ../Utils/rock/rkbin
+cd ${HERE}
+echo `pwd`
 make distclean
 [ "$?" != "0" ] && exit
 mv .git gitb.git
 make mrproper
 [ "$?" != "0" ] && exit
-./make.sh evb-rk3328
+./make.sh rk3328
 [ "$?" != "0" ] && exit
 #[ "$?" != "0" ] && exit
 mv gitb.git .git
-HERE=`pwd` 
-cd ../../Deploy
+mv make.shOLD make.sh
+#HERE=`pwd` 
+#cd ../../Deploy
 #ln -s ${BOOT_M7_FROM_DEPLOY}/idbloader.img m7-idbloader.img
-ln -s ${BOOT_M7_FROM_DEPLOY}/uboot.img m7-uboot.img
-ln -s ${BOOT_M7_FROM_DEPLOY}/trust.img m7-trust.img
+#ln -s ${BOOT_M7_FROM_DEPLOY}/uboot.img m7-uboot.img
+#ln -s ${BOOT_M7_FROM_DEPLOY}/trust.img m7-trust.img
 echo "0" > /tmp/result

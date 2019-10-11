@@ -12,11 +12,7 @@ cleanup_and_configure() {
 	make mrproper
 	make distclean
 	echo "Config is ${CONFIG_FILE}"
-	if [ "$KERNEL" = "$LAYERSCAPE" ]; then
-		make NOVAsomN1_defconfig
-	else
-		make ${CONFIG_FILE}
-	fi
+	make ${CONFIG_FILE}
 }
 
 echo "Working on ${KERNEL} with ${SOURCEMEFILE}"
@@ -32,7 +28,6 @@ if [ "$KERNEL" = "linux-imx_4.1.15_1.2.0_ga" ]; then
 	make -j32
 	[ ! "$?" = "0" ] && exit
 	cd ..
-	cp arch/arm/boot/zImage ../../Blobs/linux-nxp_p-4.1.15.2_zImage
 	cd ../../Deploy
 	rm P_zImage
 	ln -s ../Kernel/${KERNEL}/arch/arm/boot/zImage P_zImage
@@ -42,7 +37,6 @@ else
 	[ ! "$?" = "0" ] && exit
 	make -j32 modules
 	[ ! "$?" = "0" ] && exit
-	cp arch/arm/boot/zImage ../../Blobs/linux-nxp_u-4.1.43_zImage
 	cd ../../Deploy
 	rm U_zImage
 	ln -s ../Kernel/${KERNEL}/arch/arm/boot/zImage U_zImage

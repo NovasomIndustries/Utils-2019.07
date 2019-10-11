@@ -1,11 +1,6 @@
 #!/bin/sh
 HERE=`pwd`
-#cd /dev
-#for i in 1 2 3 4 5 6 7 8 9 10; do
-#        ln -s mmcblk2p${i} mmcblk0p${i}
-#done
-#cd ${HERE}
-mount /dev/mmcblk0p4 /mnt
+mount /dev/mmcblk0p2 /mnt
 if [ -d /mnt/application_storage ]; then
 	cp -r /mnt/application_storage /tmp/.
 fi

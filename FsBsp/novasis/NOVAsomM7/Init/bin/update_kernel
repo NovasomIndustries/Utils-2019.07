@@ -3,10 +3,13 @@ get_exec m7_Image
 [ "$?" = "1" ] && exit 1
 get_exec m7_dtb.dtb
 [ "$?" = "1" ] && exit 1
+get_exec m7_boot.scr
+[ "$?" = "1" ] && exit 1
 rm -rf /tmp/update_dir
 mkdir /tmp/update_dir
-mount /dev/mmcblk0p8 /tmp/update_dir
+mount /dev/mmcblk0p1 /tmp/update_dir
 cp /tmp/m7_Image /tmp/update_dir/Image
 cp /tmp/m7_dtb.dtb /tmp/update_dir/dtb.dtb
+cp /tmp/m7_boot.scr /tmp/update_dir/boot.scr
 umount /tmp/update_dir
 

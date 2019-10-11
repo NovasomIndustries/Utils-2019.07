@@ -18,7 +18,21 @@ KERNELDIR="../../Kernel/linux-4.4.167_M7"
 DEPLOYDIR="../../Deploy"
 TOOLSDIR="../../Utils/rock/rkbin"
 
-FILES="${KERNELDIR}/${KERNEL} idbloader.img  ${BOOTDIR}/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+# Pre processing
+${BOOTDIR}/tools/mkimage -n rk3328 -T rksd -d rkbin/rk3328_ddr_786MHz_v1.13.bin /tmp/idbloader.img
+cat rkbin/rk322xh_miniloader_v2.46.bin >> /tmp/idbloader.img
+rkbin/tools/loaderimage --pack --uboot ${BOOTDIR}/u-boot-dtb.bin /tmp/uboot.img 0x200000
+mkimage -C none -A arm -T script -d boot-novasom-m7.cmd /tmp/boot.scr
+
+UINITRD_SIZE=`stat --printf="%s"  ${DEPLOYDIR}/uInitrd`
+if [ ${UINITRD_SIZE} -le 41943040 ]; then
+	UINITRD_SIZE="64M"
+else
+	UINITRD_SIZE="512M"
+fi
+echo "uInitrd is ${UINITRD_SIZE}"
+
+FILES="${KERNELDIR}/${KERNEL} /tmp/idbloader.img  /tmp/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
 for i in ${FILES}; do
 	if ! [ -f ${i} ]; then
 		NOTFOUND=`basename ${i}`
@@ -45,83 +59,78 @@ sudo dd if=/dev/zero of=${DISK} bs=32M count=1 > /dev/null 2>&1
 sync
 echo "Done"
 echo -n "Creating partitions ... "
-sudo sgdisk -n 1::+7M  -c 1:loader1 ${DISK}
-sudo sgdisk -n 2::+4M  -c 2:loader2 ${DISK}
-sudo sgdisk -n 3::+4M  -c 3:trust ${DISK}
-sudo sgdisk -n 8::+512M -c 8:M7Boot ${DISK}
-sudo sgdisk -n 4::+16M -c 4:config ${DISK}
+sudo sgdisk -n 1:16M:+${UINITRD_SIZE} -c 1:M7Boot ${DISK}
+sudo sgdisk -n 2::+16M -c 2:config ${DISK}
 if [ "${USERNUM}" = "1" ]; then
 	if [ "${SIZE1}" = "0" ]; then
-		sudo sgdisk -n 5::      -c 5:user1 ${DISK}
+		sudo sgdisk -n 3::      -c 3:user1 ${DISK}
 	else
-		sudo sgdisk -n 5::+${SIZE1}M     -c 5:user1 ${DISK}
+		sudo sgdisk -n 3::+${SIZE1}M     -c 3:user1 ${DISK}
 	fi
 
 fi
-P6DONE="0"
+P4DONE="0"
 if [ "${USERNUM}" = "2" ]; then
 	if [ "${SIZE1}" = "0" ]; then
 		if ! [ "${SIZE2}" = "0" ]; then
-			sudo sgdisk -n 6::+${SIZE2}M      -c 6:user2 ${DISK}
+			sudo sgdisk -n 3::+${SIZE2}M      -c 3:user2 ${DISK}
 			P6DONE="1"
 		fi
-		sudo sgdisk -n 5::      -c 5:user1 ${DISK}
+		sudo sgdisk -n 3::      -c 3:user1 ${DISK}
 	else
-		sudo sgdisk -n 5::+${SIZE1}M      -c 5:user1 ${DISK}
+		sudo sgdisk -n 3::+${SIZE1}M      -c 3:user1 ${DISK}
 	fi
-	if [ "${P6DONE}" = "0" ]; then
+	if [ "${P4DONE}" = "0" ]; then
 		if [ "${SIZE2}" = "0" ]; then
-			sudo sgdisk -n 6::      -c 6:user2 ${DISK}
+			sudo sgdisk -n 4::      -c 4:user2 ${DISK}
 		else
-			sudo sgdisk -n 6::+${SIZE2}M      -c 6:user2 ${DISK}
+			sudo sgdisk -n 4::+${SIZE2}M      -c 4:user2 ${DISK}
 		fi
 	fi
 fi
-sudo sgdisk -A 8:set:2 -t 8:0700 ${DISK}
-sleep 1
-sync
 sleep 1
 sudo partprobe ${DISK} 
 sleep 1
+echo -n "Formatting and populating partition 1... "
+yes | sudo mkfs.ext2 ${DISK}1
+echo $?
 echo "Done"
-echo -n "Formatting and populating partition 4... "
-yes | sudo mkfs.ext4 ${DISK}4
+echo -n "Formatting and populating partition 2... "
+yes | sudo mkfs.ext4 ${DISK}2
 echo "Done"
 if [ "${USERNUM}" = "1" ]; then
-	echo -n "Formatting and populating partition 5... "
-	yes | sudo mkfs.ext4 ${DISK}5
+	echo -n "Formatting and populating partition 3... "
+	yes | sudo mkfs.ext4 ${DISK}3
 	echo "Done"
 fi
 if [ "${USERNUM}" = "2" ]; then
-	echo -n "Formatting and populating partition 5... "
-	yes | sudo mkfs.ext4 ${DISK}5
+	echo -n "Formatting and populating partition 3... "
+	yes | sudo mkfs.ext4 ${DISK}3
 	echo "Done"
-	echo -n "Formatting and populating partition 6... "
-	yes | sudo mkfs.ext4 ${DISK}6
+	echo -n "Formatting and populating partition 4... "
+	yes | sudo mkfs.ext4 ${DISK}4
 	echo "Done"
 fi
-echo -n "Formatting and populating partition 8... "
-yes | sudo mkfs.ext2 ${DISK}8
-echo $?
-echo "Done"
 sync
 echo "Storing idbloader.img "
-sudo dd if=idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
+sudo dd if=/tmp/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
 echo "Storing uboot.img"
-sudo dd if=${BOOTDIR}/uboot.img  of=${DISK} seek=$(((0x002000 + 0x2000))) ibs=1M conv=sync,fsync
+sudo dd if=/tmp/uboot.img  of=${DISK} seek=16384 conv=sync,fsync,notrunc
 echo "Storing trust.img "
-sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=$(((0x004000 + 0x2000))) ibs=1M conv=sync,fsync
+sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=24576 conv=sync,fsync,notrunc
 sync
 
 rm -rf mdisk ; mkdir mdisk
-sudo mount ${DISK}8 mdisk
+sudo mount ${DISK}1 mdisk
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
 sudo cp ${DEPLOYDIR}/m7_dtb.dtb mdisk/dtb.dtb
 sudo cp ${DEPLOYDIR}/uInitrd mdisk/.
 sudo cp ${DEPLOYDIR}/*.config mdisk/.
+sudo cp /tmp/boot.scr mdisk/.
 cat NOVAsomParams_M7 > /tmp/NOVAsomParams_Local
 sudo cp /tmp/NOVAsomParams_Local mdisk/NOVAsomParams
 sudo cp /tmp/NOVAsomParams_Local ${DEPLOYDIR}/NOVAsomParams
+sudo cp /tmp/boot.scr ${DEPLOYDIR}/m7_boot.scr
 sudo umount mdisk
 sync
 echo "Done."

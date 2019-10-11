@@ -25,7 +25,7 @@ if [ "$?" == "0" ]; then
 	echo "	priority=5" >> /etc/wpa_supplicant.conf
 	echo "}" >> /etc/wpa_supplicant.conf
 
-	mount /dev/mmcblk0p4 /mnt
+	mount /dev/mmcblk0p2 /mnt
 	cp /etc/wpa_supplicant.conf /mnt/sysconfig/etc/wpa_supplicant.conf
 	umount /mnt
 	echo "wpa_supplicant.conf stored in permanent storage"

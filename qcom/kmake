@@ -13,6 +13,7 @@ make -j32 Image
 make -j32 modules
 [ ! "$?" = "0" ] && exit
 make qcom/apq8016-sbc.dtb
-cp arch/arm64/boot/Image /Devel/NOVAsdk${VERSION}/Blobs/linux-qualcomm-4.11.0_Image
-cp arch/arm64/boot/Image /Devel/NOVAsdk${VERSION}/Deploy/.
+cd ../../Deploy
+rm Image
+ln -s ../Kernel/${KERNEL}/arch/arm64/boot/Image
 echo "0" > /tmp/result
