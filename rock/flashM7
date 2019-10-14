@@ -27,6 +27,10 @@ mkimage -C none -A arm -T script -d boot-novasom-m7.cmd /tmp/boot.scr
 UINITRD_SIZE=`stat --printf="%s"  ${DEPLOYDIR}/uInitrd`
 if [ ${UINITRD_SIZE} -le 41943040 ]; then
 	UINITRD_SIZE="64M"
+else if [ ${UINITRD_SIZE} -le 67108864 ]; then
+	UINITRD_SIZE="96M"
+else if [ ${UINITRD_SIZE} -le 100663296 ]; then
+	UINITRD_SIZE="128M"
 else
 	UINITRD_SIZE="512M"
 fi
@@ -122,6 +126,11 @@ sync
 
 rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}1 mdisk
+mkdir mdisk/binfiles
+sudo cp /tmp/idbloader.img mdisk/binfiles/.
+sudo cp /tmp/uboot.img /mdisk/binfiles/.
+sudo cp ${BOOTDIR}/trust.img /mdisk/binfiles/.
+
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
 sudo cp ${DEPLOYDIR}/m7_dtb.dtb mdisk/dtb.dtb
 sudo cp ${DEPLOYDIR}/uInitrd mdisk/.
