@@ -26,11 +26,11 @@ mkimage -C none -A arm -T script -d boot-novasom-m7.cmd /tmp/boot.scr
 
 UINITRD_SIZE=`stat --printf="%s"  ${DEPLOYDIR}/uInitrd`
 if [ ${UINITRD_SIZE} -le 41943040 ]; then
-	UINITRD_SIZE="64M"
-else if [ ${UINITRD_SIZE} -le 67108864 ]; then
-	UINITRD_SIZE="96M"
-else if [ ${UINITRD_SIZE} -le 100663296 ]; then
-	UINITRD_SIZE="128M"
+	UINITRD_SIZE="68M"
+elif [ ${UINITRD_SIZE} -le 67108864 ]; then
+	UINITRD_SIZE="100M"
+elif [ ${UINITRD_SIZE} -le 100663296 ]; then
+	UINITRD_SIZE="132M"
 else
 	UINITRD_SIZE="512M"
 fi
@@ -126,22 +126,22 @@ sync
 
 rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}1 mdisk
-mkdir mdisk/binfiles
-sudo cp /tmp/idbloader.img mdisk/binfiles/.
-sudo cp /tmp/uboot.img /mdisk/binfiles/.
-sudo cp ${BOOTDIR}/trust.img /mdisk/binfiles/.
-
+sudo mkdir mdisk/binfiles
+sudo cp /tmp/idbloader.img mdisk/binfiles
+sudo cp /tmp/uboot.img mdisk/binfiles
+sudo cp ${BOOTDIR}/trust.img mdisk/binfiles
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
 sudo cp ${DEPLOYDIR}/m7_dtb.dtb mdisk/dtb.dtb
 sudo cp ${DEPLOYDIR}/uInitrd mdisk/.
 sudo cp ${DEPLOYDIR}/*.config mdisk/.
 sudo cp /tmp/boot.scr mdisk/.
-cat NOVAsomParams_M7 > /tmp/NOVAsomParams_Local
-sudo cp /tmp/NOVAsomParams_Local mdisk/NOVAsomParams
-sudo cp /tmp/NOVAsomParams_Local ${DEPLOYDIR}/NOVAsomParams
-sudo cp /tmp/boot.scr ${DEPLOYDIR}/m7_boot.scr
+#cat NOVAsomParams_M7 > /tmp/NOVAsomParams_Local
+#echo "Storing config files"
+#sudo cp /tmp/NOVAsomParams_Local mdisk/NOVAsomParams
+#sudo cp /tmp/NOVAsomParams_Local ${DEPLOYDIR}/NOVAsomParams
 sudo umount mdisk
 sync
+sudo cp /tmp/boot.scr ${DEPLOYDIR}/m7_boot.scr
 echo "Done."
 echo -n "Finishing up ..."
 sync
