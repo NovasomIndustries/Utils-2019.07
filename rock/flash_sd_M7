@@ -75,18 +75,21 @@ if [ "${USERNUM}" = "1" ]; then
 	fi
 
 fi
-P4DONE="0"
+P5DONE="0"
 if [ "${USERNUM}" = "2" ]; then
 	if [ "${SIZE1}" = "0" ]; then
 		if ! [ "${SIZE2}" = "0" ]; then
-			sudo sgdisk -n 4::+${SIZE2}M      -c 4:user1 ${DISK}
-			P6DONE="1"
+			sudo sgdisk -n 5::+${SIZE2}M      -c 5:user2 ${DISK}
+			P5DONE="1"
+		else
+			sudo sgdisk -n 5::+32M      -c 5:user2 ${DISK}
+			P5DONE="1"
 		fi
 		sudo sgdisk -n 4::      -c 4:user1 ${DISK}
 	else
 		sudo sgdisk -n 4::+${SIZE1}M      -c 4:user1 ${DISK}
 	fi
-	if [ "${P4DONE}" = "0" ]; then
+	if [ "${P5DONE}" = "0" ]; then
 		if [ "${SIZE2}" = "0" ]; then
 			sudo sgdisk -n 5::      -c 5:user2 ${DISK}
 		else
