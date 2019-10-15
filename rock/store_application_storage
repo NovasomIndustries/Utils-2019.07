@@ -8,7 +8,7 @@ sync
 sudo rm -rf /tmp/tmpmount
 sudo mkdir /tmp/tmpmount
 sleep 1
-sudo mount ${DISK}4 /tmp/tmpmount
+sudo mount ${DISK}2 /tmp/tmpmount
 [ "$?" != "0" ] && return 1
 sudo rm -rf /tmp/tmpmount/application_storage
 sudo mkdir /tmp/tmpmount/application_storage
