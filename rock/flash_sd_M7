@@ -1,0 +1,157 @@
+#!/bin/bash
+# ${1} is number of user partition
+# ${2} is size of first user partition, if enabled
+# ${3} is size of second user partition, if enabled
+# ${4} is the device
+# ${5} is the dtb
+
+USERNUM=${1}
+SIZE1=${2}
+SIZE2=${3}
+DISK=${4}
+DTB=${5}
+# NOVASOM_PARAMS=${7}
+# RAMDISK_SIZE=${8}
+KERNEL="arch/arm64/boot/Image"
+BOOTDIR="../../Bootloader/u-boot-novasomM7-2017.09"
+KERNELDIR="../../Kernel/linux-4.4.167_M7"
+DEPLOYDIR="../../Deploy"
+TOOLSDIR="../../Utils/rock/rkbin"
+
+# Pre processing
+${BOOTDIR}/tools/mkimage -n rk3328 -T rksd -d rkbin/rk3328_ddr_786MHz_v1.13.bin /tmp/idbloader.img
+cat rkbin/rk322xh_miniloader_v2.46.bin >> /tmp/idbloader.img
+rkbin/tools/loaderimage --pack --uboot ${BOOTDIR}/u-boot-dtb.bin /tmp/uboot.img 0x200000
+mkimage -C none -A arm -T script -d sdboot-novasom-m7.cmd /tmp/boot.scr
+
+# Compute pointer and size of the file system
+# Leave the same space as empty in file system area
+ROOTFS_REAL_PATH=`readlink -f ${DEPLOYDIR}/uInitrd`
+ROOTFS_REAL_DIR=`dirname ${ROOTFS_REAL_PATH}`
+ROOTFS_REAL_FILE=${ROOTFS_REAL_DIR}/rootfs.ext2
+ROOTFS_SIZE=`stat --printf="%s"  ${ROOTFS_REAL_FILE}`
+let ROOTFS_SIZE=${ROOTFS_SIZE}/1024
+let ROOTFS_SIZE=${ROOTFS_SIZE}/512
+#echo "$ROOTFS_REAL_DIR $ROOTFS_REAL_FILE ${ROOTFS_SIZE}M"
+#done
+
+UINITRD_SIZE="64M"
+
+FILES="${KERNELDIR}/${KERNEL} /tmp/idbloader.img  /tmp/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+for i in ${FILES}; do
+	if ! [ -f ${i} ]; then
+		NOTFOUND=`basename ${i}`
+		NOTFOUND=${i}
+		echo "${NOTFOUND} not found. giving up"
+		echo "1" > /tmp/result
+		exit 1
+	fi
+done
+if ! [ -f ../../Deploy/uInitrd ]; then
+	echo "uInitrd not found. giving up"
+	echo "1" > /tmp/result
+	exit 1
+fi
+sudo umount /dev/sdb*  > /dev/null 2>&1
+[ "${DISK}" = "" ] && DISK="/dev/sdb"
+echo -n "Creating basic structure on ${DISK} ... "
+sudo sgdisk -Z ${DISK} > /dev/null 2>&1
+sudo partprobe ${DISK} > /dev/null 2>&1
+sync
+echo "Done"
+echo -n "Zeroing ${DISK} ... "
+sudo dd if=/dev/zero of=${DISK} bs=32M count=1 > /dev/null 2>&1
+sync
+echo "Done"
+echo -n "Creating partitions ... "
+sudo sgdisk -n 1:16M:+${UINITRD_SIZE} -c 1:M7Boot ${DISK}
+sudo sgdisk -n 2::+16M -c 2:config ${DISK}
+sudo sgdisk -n 3::+${ROOTFS_SIZE}M -c 3:rootfs ${DISK}
+if [ "${USERNUM}" = "1" ]; then
+	if [ "${SIZE1}" = "0" ]; then
+		sudo sgdisk -n 4::      -c 4:user1 ${DISK}
+	else
+		sudo sgdisk -n 4::+${SIZE1}M     -c 4:user1 ${DISK}
+	fi
+
+fi
+P4DONE="0"
+if [ "${USERNUM}" = "2" ]; then
+	if [ "${SIZE1}" = "0" ]; then
+		if ! [ "${SIZE2}" = "0" ]; then
+			sudo sgdisk -n 4::+${SIZE2}M      -c 4:user1 ${DISK}
+			P6DONE="1"
+		fi
+		sudo sgdisk -n 4::      -c 4:user1 ${DISK}
+	else
+		sudo sgdisk -n 4::+${SIZE1}M      -c 4:user1 ${DISK}
+	fi
+	if [ "${P4DONE}" = "0" ]; then
+		if [ "${SIZE2}" = "0" ]; then
+			sudo sgdisk -n 5::      -c 5:user2 ${DISK}
+		else
+			sudo sgdisk -n 5::+${SIZE2}M      -c 5:user2 ${DISK}
+		fi
+	fi
+fi
+sleep 1
+sudo partprobe ${DISK} 
+sleep 1
+echo -n "Formatting and populating partition 1... "
+yes | sudo mkfs.ext2 ${DISK}1
+echo $?
+echo "Done"
+echo -n "Formatting and populating partition 2... "
+yes | sudo mkfs.ext4 ${DISK}2
+echo "Done"
+echo -n "Formatting and populating partition 3... "
+yes | sudo mkfs.ext4 ${DISK}3
+echo "Done"
+if [ "${USERNUM}" = "1" ]; then
+	echo -n "Formatting and populating partition 4... "
+	yes | sudo mkfs.ext4 ${DISK}4
+	echo "Done"
+fi
+if [ "${USERNUM}" = "2" ]; then
+	echo -n "Formatting and populating partition 4... "
+	yes | sudo mkfs.ext4 ${DISK}4
+	echo "Done"
+	echo -n "Formatting and populating partition 5... "
+	yes | sudo mkfs.ext4 ${DISK}5
+	echo "Done"
+fi
+sync
+echo "Storing idbloader.img "
+sudo dd if=/tmp/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
+echo "Storing uboot.img"
+sudo dd if=/tmp/uboot.img  of=${DISK} seek=16384 conv=sync,fsync,notrunc
+echo "Storing trust.img "
+sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=24576 conv=sync,fsync,notrunc
+sync
+
+sudo rm -rf /tmp/mdisk
+mkdir /tmp/mdisk
+sudo mount ${DISK}1 /tmp/mdisk
+sudo mkdir /tmp/mdisk/binfiles
+sudo cp /tmp/idbloader.img /tmp/mdisk/binfiles
+sudo cp /tmp/uboot.img /tmp/mdisk/binfiles
+sudo cp ${BOOTDIR}/trust.img /tmp/mdisk/binfiles
+sudo cp ${KERNELDIR}/${KERNEL} /tmp/mdisk/Image
+sudo cp ${DEPLOYDIR}/m7_dtb.dtb /tmp/mdisk/dtb.dtb
+sudo cp ${DEPLOYDIR}/*.config /tmp/mdisk/.
+sudo cp /tmp/boot.scr /tmp/mdisk/.
+sudo umount /tmp/mdisk
+sync
+sudo rm -rf /tmp/rootfs
+mkdir /tmp/rootfs
+sudo mount -t ext3 -o loop ${ROOTFS_REAL_FILE} /tmp/rootfs
+sudo mount ${DISK}3 /tmp/mdisk
+sudo cp -a /tmp/rootfs/* /tmp/mdisk/.
+sudo umount /tmp/rootfs /tmp/mdisk
+
+sudo cp /tmp/boot.scr ${DEPLOYDIR}/m7_boot.scr
+echo "Done."
+echo -n "Finishing up ..."
+sync
+echo "Done."
+echo "0" > /tmp/result
