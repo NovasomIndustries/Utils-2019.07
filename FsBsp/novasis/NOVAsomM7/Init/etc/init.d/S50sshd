@@ -6,7 +6,7 @@
 # Make sure the ssh-keygen progam exists
 [ -f /usr/bin/ssh-keygen ] || exit 0
 
-mount /dev/mmcblk0p4 /mnt
+mount /dev/mmcblk0p2 /mnt
 if [ -d /mnt/sysconfig/ssh ]; then
 	cp -r /mnt/sysconfig/ss* /etc/.
 else

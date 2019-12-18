@@ -24,7 +24,7 @@ cat rkbin/rk322xh_miniloader_v2.46.bin >> /tmp/idbloader.img
 rkbin/tools/loaderimage --pack --uboot ${BOOTDIR}/u-boot-dtb.bin /tmp/uboot.img 0x200000
 mkimage -C none -A arm -T script -d boot-novasom-m7.cmd /tmp/boot.scr
 
-UINITRD_SIZE=`stat --printf="%s"  ${DEPLOYDIR}/uInitrd`
+UINITRD_SIZE=`stat -L --printf="%s"  ${DEPLOYDIR}/uInitrd`
 if [ ${UINITRD_SIZE} -le 41943040 ]; then
 	UINITRD_SIZE="68M"
 elif [ ${UINITRD_SIZE} -le 67108864 ]; then
