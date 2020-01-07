@@ -124,7 +124,7 @@ echo "Storing trust.img "
 sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=24576 conv=sync,fsync,notrunc
 sync
 
-rm -rf mdisk ; mkdir mdisk
+sudo rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}1 mdisk
 sudo mkdir mdisk/binfiles
 sudo cp /tmp/idbloader.img mdisk/binfiles
