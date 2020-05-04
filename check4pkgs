@@ -5,5 +5,5 @@ dpkg -s $1 &> /dev/null
 if [ $? -eq 0 ]; then
     echo "Package $1 is installed!"
 else
-    sudp apt-get install $1 -y
+    sudo apt-get install $1 -y
 fi
