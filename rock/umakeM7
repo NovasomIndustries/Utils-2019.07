@@ -1,31 +1,23 @@
 #!/bin/sh
 . ../SourceMe64
 echo "1" > /tmp/result
-#HERE=`pwd`
-rm -f ../../Deploy/m7-idbloader.img ../../Deploy/m7-uboot.img ../../Deploy/m7-trust.img
-BOOT_M7="../../Bootloader/u-boot-novasomM7-2017.09"
-echo "1" > /tmp/result
-mv ${BOOT_M7}/make.sh ${BOOT_M7}/make.shOLD
-cp uboot_rockchip_make.sh ${BOOT_M7}/make.sh
-cd ${BOOT_M7}
 HERE=`pwd`
-cd ..
-ln -s ../Utils/rock/rkbin
+rm -f ../../Deploy/m7-idbloader.img ../../Deploy/m7-uboot.img ../../Deploy/m7-trust.img
+BOOT_M7="../../Bootloader/u-boot-novasomM7-2020-07"
+ATF_M7="../../Bootloader/atf_2019.07"
+RKBIN_FOLDER="rkbin_m7_2019.07"
+TRUST_M7="../../Bootloader/${RKBIN_FOLDER}"
+echo "1" > /tmp/result
+cd ${ATF_M7}
+make realclean
+make PLAT=rk3328
 cd ${HERE}
-echo `pwd`
-make distclean
-[ "$?" != "0" ] && exit
-mv .git gitb.git
-make mrproper
-[ "$?" != "0" ] && exit
-./make.sh rk3328
-[ "$?" != "0" ] && exit
-#[ "$?" != "0" ] && exit
-mv gitb.git .git
-mv make.shOLD make.sh
-#HERE=`pwd` 
-#cd ../../Deploy
-#ln -s ${BOOT_M7_FROM_DEPLOY}/idbloader.img m7-idbloader.img
-#ln -s ${BOOT_M7_FROM_DEPLOY}/uboot.img m7-uboot.img
-#ln -s ${BOOT_M7_FROM_DEPLOY}/trust.img m7-trust.img
-echo "0" > /tmp/result
+cd ${TRUST_M7}
+./tools/trust_merger RKTRUST/RK3328TRUST.ini
+cd ${HERE}
+cd ${BOOT_M7}
+export BL31=${ATF_M7}/build/rk3328/release/bl31/bl31.elf
+make distclean  
+cp ../${RKBIN_FOLDER}/trust.img .
+make rock64-rk3328_defconfig ; make -j32
+echo "$?" > /tmp/result

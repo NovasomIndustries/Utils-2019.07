@@ -13,15 +13,11 @@ DTB=${5}
 # NOVASOM_PARAMS=${7}
 # RAMDISK_SIZE=${8}
 KERNEL="arch/arm64/boot/Image"
-BOOTDIR="../../Bootloader/u-boot-novasomM7-2017.09"
+BOOTDIR="../../Bootloader/u-boot-novasomM7-2020-07"
 KERNELDIR="../../Kernel/linux-4.4.167_M7"
 DEPLOYDIR="../../Deploy"
-TOOLSDIR="../../Utils/rock/rkbin"
 
 # Pre processing
-${BOOTDIR}/tools/mkimage -n rk3328 -T rksd -d rkbin/rk3328_ddr_786MHz_v1.13.bin /tmp/idbloader.img
-cat rkbin/rk322xh_miniloader_v2.46.bin >> /tmp/idbloader.img
-rkbin/tools/loaderimage --pack --uboot ${BOOTDIR}/u-boot-dtb.bin /tmp/uboot.img 0x200000
 mkimage -C none -A arm -T script -d boot-novasom-m7.cmd /tmp/boot.scr
 
 UINITRD_SIZE=`stat -L --printf="%s"  ${DEPLOYDIR}/uInitrd`
@@ -36,7 +32,7 @@ else
 fi
 echo "uInitrd is ${UINITRD_SIZE}"
 
-FILES="${KERNELDIR}/${KERNEL} /tmp/idbloader.img  /tmp/uboot.img ${BOOTDIR}/trust.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd NOVAsomParams_M7"
+FILES="${KERNELDIR}/${KERNEL} ${BOOTDIR}/idbloader.img  ${BOOTDIR}/trust.img ${BOOTDIR}/u-boot.img ${DEPLOYDIR}/m7_dtb.dtb ${DEPLOYDIR}/uInitrd"
 for i in ${FILES}; do
 	if ! [ -f ${i} ]; then
 		NOTFOUND=`basename ${i}`
@@ -46,7 +42,7 @@ for i in ${FILES}; do
 		exit 1
 	fi
 done
-if ! [ -f ../../Deploy/uInitrd ]; then
+if ! [ -f ${DEPLOYDIR}/uInitrd ]; then
 	echo "uInitrd not found. giving up"
 	echo "1" > /tmp/result
 	exit 1
@@ -117,33 +113,32 @@ if [ "${USERNUM}" = "2" ]; then
 fi
 sync
 echo "Storing idbloader.img "
-sudo dd if=/tmp/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
-echo "Storing uboot.img"
-sudo dd if=/tmp/uboot.img  of=${DISK} seek=16384 conv=sync,fsync,notrunc
-echo "Storing trust.img "
-sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=24576 conv=sync,fsync,notrunc
+sudo dd if=${BOOTDIR}/idbloader.img of=${DISK}  seek=64 conv=notrunc > /dev/null 2>&1
 sync
 
+echo "Storing uboot.img"
+sudo dd if=${BOOTDIR}/u-boot.itb  of=${DISK} seek=16384 conv=sync,fsync,notrunc > /dev/null 2>&1
+sync
+
+echo "Storing trust.img"
+sudo dd if=${BOOTDIR}/trust.img  of=${DISK} seek=24576 conv=sync,fsync,notrunc > /dev/null 2>&1
+sync
+
+echo "Populating boot partition"
 sudo rm -rf mdisk ; mkdir mdisk
 sudo mount ${DISK}1 mdisk
 sudo mkdir mdisk/binfiles
-sudo cp /tmp/idbloader.img mdisk/binfiles
-sudo cp /tmp/uboot.img mdisk/binfiles
-sudo cp ${BOOTDIR}/trust.img mdisk/binfiles
+sudo cp ${BOOTDIR}/idbloader.img mdisk/binfiles
+sudo cp ${BOOTDIR}/u-boot.itb mdisk/binfiles
 sudo cp ${KERNELDIR}/${KERNEL} mdisk/Image
 sudo cp ${DEPLOYDIR}/m7_dtb.dtb mdisk/dtb.dtb
 sudo cp ${DEPLOYDIR}/uInitrd mdisk/.
 sudo cp ${DEPLOYDIR}/*.config mdisk/.
 sudo cp /tmp/boot.scr mdisk/.
-#cat NOVAsomParams_M7 > /tmp/NOVAsomParams_Local
-#echo "Storing config files"
-#sudo cp /tmp/NOVAsomParams_Local mdisk/NOVAsomParams
-#sudo cp /tmp/NOVAsomParams_Local ${DEPLOYDIR}/NOVAsomParams
-sudo umount mdisk
-sync
 sudo cp /tmp/boot.scr ${DEPLOYDIR}/m7_boot.scr
 echo "Done."
 echo -n "Finishing up ..."
+sudo umount mdisk
 sync
 echo "Done."
 echo "0" > /tmp/result

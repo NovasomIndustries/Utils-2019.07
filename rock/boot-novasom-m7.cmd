@@ -7,7 +7,7 @@ setenv bootdev "mmc 1:1"
 
 echo "NOVAsom M7 Boot script loaded from ${devtype} ${devnum}"
 
-setenv bootargs "root=${rootdev} rootwait ramdisk_size=512000 ${consoleargs} consoleblank=0"
+setenv bootargs "root=${rootdev} rootwait ramdisk_size=256000 ${consoleargs} consoleblank=0"
 
 load ${bootdev} ${ramdisk_addr_r} uInitrd
 load ${bootdev} ${kernel_addr_r} Image
