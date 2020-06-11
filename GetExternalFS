@@ -9,7 +9,9 @@ cd ../ExternalFileSystems/${CURRENTBOARD}
 rm -f ${FSNAME}*
 echo "wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}"
 wget --tries=2 --timeout=10 http://${REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}
-if ! [ "$?"="0" ]; then
+RETVAL=$?
+echo "wget returned $RETVAL"
+if ! [ "$RETVAL" = "0" ]; then
 	wget --tries=2 --timeout=10 http://${BACKUP_REPO_SERVER}/OS/${CURRENTBOARD}/${FSNAME}
 	if ! [ "$?"="0" ]; then
 		exit 1
