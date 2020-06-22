@@ -16,6 +16,7 @@ cd ${TRUST_M7}
 ./tools/trust_merger RKTRUST/RK3328TRUST.ini
 cd ${HERE}
 cd ${BOOT_M7}
+export PATH=$PATH:${BOOT_M7}/scripts/dtc
 export BL31=${ATF_M7}/build/rk3328/release/bl31/bl31.elf
 make distclean  
 cp ../${RKBIN_FOLDER}/trust.img .
