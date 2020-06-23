@@ -4,7 +4,7 @@ UPD_ELEMENTS="\
 Bootloader/u-boot-novasomM8-2017.11_${VERSION} \
 Bootloader/u-boot-novasomP-2015.04_${VERSION} \
 Bootloader/u-boot-novasomU-2016.03_${VERSION} \
-Bootloader/u-boot-novasomM7-2017.09_${VERSION}"
+Bootloader/u-boot-novasomM7-2020-07_${VERSION}"
 
 cd /Devel/NOVAsdk${VERSION}
 for i in ${UPD_ELEMENTS}; do
